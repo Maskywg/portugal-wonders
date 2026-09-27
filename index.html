@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>葡萄牙的奇觀｜陸止於此，海始於斯</title>
+<meta name="description" content="跟著 81 分鐘 4K 空拍影片走遍葡萄牙：亞速爾火山湖、馬德拉海岬、里斯本、辛特拉宮殿群、布拉加朝聖階梯、奧比多斯城牆，到歐洲大陸最西端的羅卡角。32 個影片節點都有相片、地圖定位、交通說明，並可就地播放對應段落。">
+
+<!-- Open Graph / Twitter Card -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="葡萄牙的奇觀｜陸止於此，海始於斯">
+<meta property="og:description" content="從亞速爾火山湖到歐洲最西端的羅卡角，32 個影片節點、互動地圖與交通說明，每一段都能就地看影片。">
+<meta property="og:image" content="https://maskywg.github.io/portugal-wonders/images/og-image.jpg">
+<meta property="og:url" content="https://maskywg.github.io/portugal-wonders/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="葡萄牙的奇觀｜陸止於此，海始於斯">
+<meta name="twitter:description" content="從亞速爾火山湖到歐洲最西端的羅卡角，32 個影片節點、互動地圖與交通說明，每一段都能就地看影片。">
+<meta name="twitter:image" content="https://maskywg.github.io/portugal-wonders/images/og-image.jpg">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root{
+    --bg:#fbf7ef;
+    --bg-alt:#f3ece0;
+    --ink:#2a2622;
+    --ink-soft:#675f54;
+    --blue:#1f5a8a;          /* 瓷磚藍 */
+    --blue-deep:#123456;
+    --rust:#c1502e;          /* 赤陶橘 */
+    --gold:#c99a3c;
+    --card-bg:#ffffff;
+    --border:#e6dcc8;
+    --max:1120px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.78;
+  }
+  img{max-width:100%;display:block;}
+  a{color:var(--blue);}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px;}
+
+  /* HERO */
+  .hero{
+    position:relative;min-height:92vh;display:flex;align-items:flex-end;
+    background:linear-gradient(180deg,rgba(18,52,86,.10) 0%,rgba(18,52,86,.78) 100%),url('images/hero.jpg') center 40%/cover no-repeat;
+  }
+  .hero-inner{padding:64px 24px 56px;max-width:var(--max);margin:0 auto;width:100%;color:#fff;}
+  .hero-eyebrow{letter-spacing:.14em;font-size:13px;opacity:.9;margin-bottom:14px;font-style:italic;}
+  .hero h1{font-size:clamp(32px,6vw,58px);margin:0 0 18px;font-weight:800;line-height:1.25;text-shadow:0 2px 18px rgba(0,0,0,.4);}
+  .hero p{font-size:clamp(15px,2vw,19px);max-width:680px;opacity:.95;margin:0 0 22px;}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(6px);padding:7px 14px;border-radius:999px;font-size:13px;}
+  .chip a{color:#fff;text-decoration:none;}
+
+  section{padding:60px 0 24px;}
+  .section-title{font-size:clamp(24px,3.4vw,34px);font-weight:800;margin:0 0 12px;color:var(--blue-deep);}
+  .section-sub{color:var(--ink-soft);max-width:720px;margin:0 0 30px;font-size:15.5px;}
+
+  /* INTRO */
+  .intro-card{background:var(--card-bg);border:1px solid var(--border);border-radius:18px;padding:30px;box-shadow:0 10px 30px rgba(42,38,34,.05);}
+  .video-embed{position:relative;width:100%;padding-top:56.25%;border-radius:14px;overflow:hidden;margin-top:6px;box-shadow:0 14px 34px rgba(18,52,86,.18);background:#000;}
+  .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+  .source-credit{font-size:13px;color:var(--ink-soft);margin:14px 0 0;}
+  .howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:22px;}
+  .howto div{background:var(--bg-alt);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:13.5px;color:var(--ink-soft);}
+  .howto b{display:block;color:var(--blue-deep);margin-bottom:4px;font-size:14.5px;}
+
+  /* TIMELINE */
+  .timeline{display:flex;height:44px;border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:0 6px 18px rgba(42,38,34,.07);background:#fff;}
+  .seg{display:block;height:100%;position:relative;border-right:1px solid rgba(255,255,255,.75);min-width:2px;text-decoration:none;transition:filter .15s;}
+  .seg.blank{background:#222;}
+  .seg:hover{filter:brightness(1.12) saturate(1.1);}
+  .seg span{position:absolute;left:4px;top:50%;transform:translateY(-50%);font-size:11px;color:#fff;white-space:nowrap;overflow:hidden;max-width:calc(100% - 6px);text-shadow:0 1px 2px rgba(0,0,0,.4);pointer-events:none;}
+  .tl-scale{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin:6px 2px 0;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:16px 0 0;font-size:13px;color:var(--ink-soft);}
+  .lg{display:inline-flex;align-items:center;gap:6px;}
+  .lg i{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px 14px;margin-top:24px;}
+  .toc-item{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px;transition:border-color .15s,transform .15s;}
+  .toc-item:hover{border-color:var(--blue);transform:translateY(-1px);}
+  .toc-item i{font-style:normal;color:#fff;font-weight:800;font-size:12px;min-width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .toc-item span{flex:1;}
+  .toc-item time{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+
+  /* MAP */
+  .map-tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .map-tools button{cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--ink);padding:7px 16px;border-radius:999px;font-size:13.5px;font-family:inherit;}
+  .map-tools button.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+  #map{width:100%;height:520px;border-radius:18px;border:1px solid var(--border);box-shadow:0 10px 30px rgba(42,38,34,.06);}
+  .leaflet-div-icon.pin{border:2px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);width:30px!important;height:30px!important;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.35);}
+  .leaflet-div-icon.pin span{transform:rotate(45deg);}
+  .leaflet-popup-content{font-family:inherit;font-size:13.5px;line-height:1.55;}
+  .leaflet-popup-content b{color:var(--blue-deep);}
+  .pop-btn{display:inline-block;margin:6px 6px 0 0;padding:4px 10px;border-radius:999px;background:var(--blue);color:#fff!important;text-decoration:none;font-size:12px;cursor:pointer;border:0;font-family:inherit;}
+  .pop-btn.alt{background:var(--rust);}
+
+  /* TRANSPORT */
+  .tr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+  .tr-card{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:20px 20px 16px;box-shadow:0 8px 22px rgba(42,38,34,.05);}
+  .tr-card h3{margin:0 0 8px;font-size:17px;color:var(--blue-deep);}
+  .tr-card p{margin:0;font-size:14px;color:var(--ink-soft);}
+  .routes{margin-top:22px;background:var(--bg-alt);border:1px solid var(--border);border-radius:14px;padding:18px 22px;font-size:14.5px;}
+  .routes b{color:var(--blue-deep);}
+  .routes ul{margin:8px 0 0;padding-left:20px;}
+  .routes li{margin:4px 0;}
+
+  /* NODES */
+  .node{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start;padding:56px 0;border-top:1px solid var(--border);scroll-margin-top:12px;}
+  .node.alt .node-media{order:2;}
+  .node.alt .node-text{order:1;}
+  .node-media{position:sticky;top:16px;}
+  .photo{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 16px 36px rgba(42,38,34,.14);}
+  .photo img{aspect-ratio:4/3;object-fit:cover;width:100%;}
+  .rank-badge{position:absolute;top:16px;left:16px;background:var(--blue-deep);color:#fff;font-weight:800;font-size:20px;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.65);}
+  .region-tag{position:absolute;right:14px;bottom:14px;color:#fff;font-size:12px;padding:3px 11px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+  .vframe{position:relative;display:block;width:100%;margin-top:12px;padding:0;border:0;border-radius:12px;overflow:hidden;cursor:pointer;background:#000;box-shadow:0 8px 20px rgba(18,52,86,.22);aspect-ratio:1000/464;}
+  .vframe img{width:100%;height:100%;object-fit:cover;transition:transform .35s,opacity .2s;}
+  .vframe:hover img{transform:scale(1.03);opacity:.92;}
+  .vframe .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:rgba(193,80,46,.92);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;padding-left:4px;box-shadow:0 4px 14px rgba(0,0,0,.4);border:2px solid #fff;}
+  .vframe .vlabel{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(0deg,rgba(0,0,0,.72),rgba(0,0,0,0));color:#fff;font-size:12.5px;padding:18px 12px 8px;text-align:left;}
+  .vplayer{position:relative;width:100%;margin-top:12px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 8px 20px rgba(18,52,86,.22);}
+  .vplayer iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+  .photo-credit{font-size:11.5px;color:var(--ink-soft);margin-top:8px;line-height:1.5;}
+  .node-text .country{font-size:13px;letter-spacing:.06em;color:var(--rust);font-weight:700;margin-bottom:8px;}
+  .node-text h2{font-size:clamp(22px,3vw,30px);margin:0 0 4px;color:var(--blue-deep);line-height:1.35;}
+  .en-inline{font-size:.55em;font-weight:500;color:var(--ink-soft);font-style:italic;margin-left:4px;}
+  .en-name{font-size:13.5px;color:var(--ink-soft);margin-bottom:14px;font-variant-numeric:tabular-nums;}
+  .facts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .facts span{background:var(--bg-alt);border:1px solid var(--border);padding:5px 11px;border-radius:999px;font-size:12.5px;color:var(--ink-soft);}
+  .node-text p{margin:0 0 14px;font-size:15px;}
+  .seen{font-size:13.5px;color:var(--ink);background:#eef4fa;border-left:3px solid var(--blue);padding:10px 14px;border-radius:8px;margin:16px 0 10px;}
+  .seen b{color:var(--blue-deep);}
+  .trivia{background:var(--bg-alt);border-left:3px solid var(--gold);padding:12px 16px;border-radius:8px;font-size:13.5px;color:var(--ink-soft);margin:10px 0;}
+  .trivia b{color:var(--blue-deep);}
+  .transport{background:#fff4de;border:1px solid #ecd8a8;color:#7d5b12;padding:10px 14px;border-radius:10px;font-size:13.5px;margin:10px 0 14px;}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .watch-link,.map-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;transition:background .2s;font-family:inherit;cursor:pointer;}
+  .watch-link{background:var(--blue);color:#fff;border:0;}
+  .watch-link:hover{background:var(--blue-deep);}
+  .map-link{background:#fff;color:var(--blue-deep);border:1px solid var(--border);}
+  .map-link:hover{border-color:var(--blue);}
+  .node.special{background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0));}
+
+  @media(max-width:860px){
+    .node,.node.alt{grid-template-columns:1fr;gap:22px;}
+    .node.alt .node-media,.node .node-media{order:1;position:static;}
+    .node.alt .node-text,.node .node-text{order:2;}
+    #map{height:400px;}
+    .seg span{display:none;}
+    .wrap{padding:0 16px;}
+    .intro-card{padding:18px;}
+  }
+
+  footer{background:var(--blue-deep);color:#e8edf3;padding:48px 0 32px;margin-top:40px;font-size:13px;}
+  footer a{color:#bcd6ee;}
+  .credits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px 24px;margin:20px 0;opacity:.85;}
+  .footer-note{opacity:.75;margin-top:22px;line-height:1.8;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Onde a terra se acaba e o mar começa</div>
+    <h1>葡萄牙的奇觀<br>陸止於此，海始於斯</h1>
+    <p>一支 81 分鐘的 4K 空拍，從大西洋中央的火山湖出發，穿過里斯本的河口、辛特拉山裡的彩色宮殿、布拉加的朝聖階梯與奧比多斯的白牆小巷，最後停在歐洲大陸最西端的懸崖。這一頁把它拆成 32 個節點，每一段都能直接看。</p>
+    <div class="hero-meta">
+      <span class="chip">🇵🇹 大陸＋兩座群島</span>
+      <span class="chip">📍 32 個影片節點</span>
+      <span class="chip">▶ <a href="https://youtu.be/hb2RsQ2j0YQ" target="_blank" rel="noopener">原始影片《Unreal Atlas 異境》</a></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section id="intro">
+    <h2 class="section-title">整支影片，一張地圖看完</h2>
+    <p class="section-sub">這支影片沒有旁白，也沒有官方章節；但每換一個地方，畫面左下角都會淡入一行地點名稱。本頁就是依照這些標籤，把 81 分鐘切成 32 個節點，並逐一查證地理、歷史與人口等公開資料寫成介紹。</p>
+    <div class="intro-card">
+      <div class="video-embed">
+        <iframe src="https://www.youtube.com/embed/hb2RsQ2j0YQ" title="葡萄牙的奇觀｜歐洲的盡頭｜葡萄牙最令人驚嘆的地方｜4K旅行紀錄片" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p class="source-credit">影片來源：YouTube 頻道《Unreal Atlas 異境》〈葡萄牙的奇觀｜歐洲的盡頭｜葡萄牙最令人驚嘆的地方｜4K旅行紀錄片〉，全長約 81 分鐘。</p>
+      <div class="howto">
+        <div><b>▶ 就地播放</b>每個節點下方的影片畫面按一下，就會只播放那一段（從標籤出現到下一個地點）。</div>
+        <div><b>🗺️ 地圖與時間軸</b>時間軸依影片長度等比例分段、依地區上色；點任何一段或地圖上的圖釘，都會跳到對應介紹。</div>
+        <div><b>🔎 推測的部分</b>影片只標到「Azores」「Madeira」「Alentejo」這類大範圍；文中寫「推測」處，是我依畫面比對的判斷，不是官方標註。</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="timeline-section">
+    <h2 class="section-title">影片時間軸</h2>
+    <p class="section-sub">灰色是序章與尾聲，其餘顏色代表地區。滑鼠停在色塊上會顯示起始時間與地點。</p>
+    <div class="timeline" role="navigation" aria-label="影片節點時間軸"><span class="seg blank" style="width:0.206%"></span><a class="seg" href="#n-prologue" style="width:2.059%;background:#9a9a9a" title="00:10 序章 · 開場預告"><span>序章 · 開場預告</span></a><a class="seg" href="#n-sete" style="width:2.965%;background:#1f8a70" title="01:50 七城湖"><span>七城湖</span></a><a class="seg" href="#n-portomoniz" style="width:3.377%;background:#d9822b" title="04:14 莫尼斯港"><span>莫尼斯港</span></a><a class="seg" href="#n-azores" style="width:4.119%;background:#1f8a70" title="06:58 亞速爾群島（多島合集）"><span>亞速爾群島（多島合集）</span></a><a class="seg" href="#n-lisbon" style="width:3.666%;background:#c1502e" title="10:18 里斯本"><span>里斯本</span></a><a class="seg" href="#n-jeronimos" style="width:2.018%;background:#c1502e" title="13:16 熱羅尼莫斯修道院"><span>熱羅尼莫斯修道院</span></a><a class="seg" href="#n-belem" style="width:3.089%;background:#c1502e" title="14:54 貝倫塔"><span>貝倫塔</span></a><a class="seg" href="#n-comercio" style="width:2.265%;background:#c1502e" title="17:24 商業廣場"><span>商業廣場</span></a><a class="seg" href="#n-alfama" style="width:2.100%;background:#c1502e" title="19:14 阿爾法瑪"><span>阿爾法瑪</span></a><a class="seg" href="#n-saojorge" style="width:1.977%;background:#c1502e" title="20:56 聖若熱城堡"><span>聖若熱城堡</span></a><a class="seg" href="#n-rossio" style="width:1.936%;background:#c1502e" title="22:32 羅西歐廣場"><span>羅西歐廣場</span></a><a class="seg" href="#n-cascais" style="width:4.242%;background:#8e5ea2" title="24:06 卡斯凱什"><span>卡斯凱什</span></a><a class="seg" href="#n-madeira" style="width:4.119%;background:#d9822b" title="27:32 馬德拉（島嶼風光）"><span>馬德拉（島嶼風光）</span></a><a class="seg" href="#n-nazare" style="width:3.913%;background:#b8892a" title="30:52 納札雷"><span>納札雷</span></a><a class="seg" href="#n-azenhas" style="width:2.718%;background:#8e5ea2" title="34:02 海上磨坊村"><span>海上磨坊村</span></a><a class="seg" href="#n-algarve" style="width:3.460%;background:#12a4b5" title="36:14 阿爾加維海岸"><span>阿爾加維海岸</span></a><a class="seg" href="#n-monsanto" style="width:4.366%;background:#b8892a" title="39:02 蒙桑圖"><span>蒙桑圖</span></a><a class="seg" href="#n-sintra" style="width:2.306%;background:#8e5ea2" title="42:34 辛特拉"><span>辛特拉</span></a><a class="seg" href="#n-monserrate" style="width:1.730%;background:#8e5ea2" title="44:26 蒙塞拉特宮"><span>蒙塞拉特宮</span></a><a class="seg" href="#n-regaleira" style="width:2.554%;background:#8e5ea2" title="45:50 雷加萊拉莊園"><span>雷加萊拉莊園</span></a><a class="seg" href="#n-pena" style="width:3.171%;background:#8e5ea2" title="47:54 佩納宮"><span>佩納宮</span></a><a class="seg" href="#n-moorish" style="width:2.389%;background:#8e5ea2" title="50:28 摩爾人城堡"><span>摩爾人城堡</span></a><a class="seg" href="#n-braga" style="width:2.554%;background:#1b6ca8" title="52:24 布拉加"><span>布拉加</span></a><a class="seg" href="#n-bragase" style="width:1.812%;background:#1b6ca8" title="54:28 布拉加主教座堂"><span>布拉加主教座堂</span></a><a class="seg" href="#n-bomjesus" style="width:2.389%;background:#1b6ca8" title="55:56 山上仁慈耶穌朝聖所"><span>山上仁慈耶穌朝聖所</span></a><a class="seg" href="#n-sameiro" style="width:1.977%;background:#1b6ca8" title="57:52 薩梅羅聖母朝聖所"><span>薩梅羅聖母朝聖所</span></a><a class="seg" href="#n-portanova" style="width:1.606%;background:#1b6ca8" title="59:28 新門拱門"><span>新門拱門</span></a><a class="seg" href="#n-obidos" style="width:4.407%;background:#b8892a" title="60:46 奧比多斯"><span>奧比多斯</span></a><a class="seg" href="#n-obidoswall" style="width:1.524%;background:#b8892a" title="64:20 奧比多斯環城城牆"><span>奧比多斯環城城牆</span></a><a class="seg" href="#n-alentejo" style="width:2.883%;background:#12a4b5" title="65:34 阿連特茹海岸"><span>阿連特茹海岸</span></a><a class="seg" href="#n-guimaraes" style="width:4.448%;background:#1b6ca8" title="67:54 吉馬良斯"><span>吉馬良斯</span></a><a class="seg" href="#n-batalha" style="width:2.759%;background:#b8892a" title="71:30 巴塔利亞修道院"><span>巴塔利亞修道院</span></a><a class="seg" href="#n-caboroca" style="width:3.336%;background:#8e5ea2" title="73:44 羅卡角與熊灘"><span>羅卡角與熊灘</span></a><a class="seg" href="#n-outro" style="width:5.560%;background:#9a9a9a" title="76:26 尾聲 · 回顧蒙太奇"><span>尾聲 · 回顧蒙太奇</span></a></div>
+    <div class="tl-scale"><span>00:00</span><span>20:00</span><span>40:00</span><span>60:00</span><span>81:00</span></div>
+    <div class="legend"><span class="lg"><i style="background:#1f8a70"></i>亞速爾群島</span><span class="lg"><i style="background:#d9822b"></i>馬德拉群島</span><span class="lg"><i style="background:#c1502e"></i>里斯本</span><span class="lg"><i style="background:#8e5ea2"></i>里斯本海岸與辛特拉</span><span class="lg"><i style="background:#b8892a"></i>中部</span><span class="lg"><i style="background:#1b6ca8"></i>北部</span><span class="lg"><i style="background:#12a4b5"></i>南部</span></div>
+    <div class="toc"><a class="toc-item" href="#n-sete"><i style="background:#1f8a70">1</i><span>七城湖</span><time>01:50</time></a><a class="toc-item" href="#n-portomoniz"><i style="background:#d9822b">2</i><span>莫尼斯港</span><time>04:14</time></a><a class="toc-item" href="#n-azores"><i style="background:#1f8a70">3</i><span>亞速爾群島（多島合集）</span><time>06:58</time></a><a class="toc-item" href="#n-lisbon"><i style="background:#c1502e">4</i><span>里斯本</span><time>10:18</time></a><a class="toc-item" href="#n-jeronimos"><i style="background:#c1502e">5</i><span>熱羅尼莫斯修道院</span><time>13:16</time></a><a class="toc-item" href="#n-belem"><i style="background:#c1502e">6</i><span>貝倫塔</span><time>14:54</time></a><a class="toc-item" href="#n-comercio"><i style="background:#c1502e">7</i><span>商業廣場</span><time>17:24</time></a><a class="toc-item" href="#n-alfama"><i style="background:#c1502e">8</i><span>阿爾法瑪</span><time>19:14</time></a><a class="toc-item" href="#n-saojorge"><i style="background:#c1502e">9</i><span>聖若熱城堡</span><time>20:56</time></a><a class="toc-item" href="#n-rossio"><i style="background:#c1502e">10</i><span>羅西歐廣場</span><time>22:32</time></a><a class="toc-item" href="#n-cascais"><i style="background:#8e5ea2">11</i><span>卡斯凱什</span><time>24:06</time></a><a class="toc-item" href="#n-madeira"><i style="background:#d9822b">12</i><span>馬德拉（島嶼風光）</span><time>27:32</time></a><a class="toc-item" href="#n-nazare"><i style="background:#b8892a">13</i><span>納札雷</span><time>30:52</time></a><a class="toc-item" href="#n-azenhas"><i style="background:#8e5ea2">14</i><span>海上磨坊村</span><time>34:02</time></a><a class="toc-item" href="#n-algarve"><i style="background:#12a4b5">15</i><span>阿爾加維海岸</span><time>36:14</time></a><a class="toc-item" href="#n-monsanto"><i style="background:#b8892a">16</i><span>蒙桑圖</span><time>39:02</time></a><a class="toc-item" href="#n-sintra"><i style="background:#8e5ea2">17</i><span>辛特拉</span><time>42:34</time></a><a class="toc-item" href="#n-monserrate"><i style="background:#8e5ea2">18</i><span>蒙塞拉特宮</span><time>44:26</time></a><a class="toc-item" href="#n-regaleira"><i style="background:#8e5ea2">19</i><span>雷加萊拉莊園</span><time>45:50</time></a><a class="toc-item" href="#n-pena"><i style="background:#8e5ea2">20</i><span>佩納宮</span><time>47:54</time></a><a class="toc-item" href="#n-moorish"><i style="background:#8e5ea2">21</i><span>摩爾人城堡</span><time>50:28</time></a><a class="toc-item" href="#n-braga"><i style="background:#1b6ca8">22</i><span>布拉加</span><time>52:24</time></a><a class="toc-item" href="#n-bragase"><i style="background:#1b6ca8">23</i><span>布拉加主教座堂</span><time>54:28</time></a><a class="toc-item" href="#n-bomjesus"><i style="background:#1b6ca8">24</i><span>山上仁慈耶穌朝聖所</span><time>55:56</time></a><a class="toc-item" href="#n-sameiro"><i style="background:#1b6ca8">25</i><span>薩梅羅聖母朝聖所</span><time>57:52</time></a><a class="toc-item" href="#n-portanova"><i style="background:#1b6ca8">26</i><span>新門拱門</span><time>59:28</time></a><a class="toc-item" href="#n-obidos"><i style="background:#b8892a">27</i><span>奧比多斯</span><time>60:46</time></a><a class="toc-item" href="#n-obidoswall"><i style="background:#b8892a">28</i><span>奧比多斯環城城牆</span><time>64:20</time></a><a class="toc-item" href="#n-alentejo"><i style="background:#12a4b5">29</i><span>阿連特茹海岸</span><time>65:34</time></a><a class="toc-item" href="#n-guimaraes"><i style="background:#1b6ca8">30</i><span>吉馬良斯</span><time>67:54</time></a><a class="toc-item" href="#n-batalha"><i style="background:#b8892a">31</i><span>巴塔利亞修道院</span><time>71:30</time></a><a class="toc-item" href="#n-caboroca"><i style="background:#8e5ea2">32</i><span>羅卡角與熊灘</span><time>73:44</time></a></div>
+  </section>
+
+  <section id="map-section">
+    <h2 class="section-title">32 個節點的位置</h2>
+    <p class="section-sub">從西邊的亞速爾、南邊的馬德拉，到大陸上由北到南的布拉加、辛特拉、阿爾加維——點擊圖釘可以看到名稱與影片時間，並跳到介紹或直接開影片。</p>
+    <div class="map-tools" id="mapTools">
+      <button type="button" class="on" data-f="all">全部</button>
+      <button type="button" data-f="mainland">葡萄牙本島</button>
+      <button type="button" data-f="azores">亞速爾</button>
+      <button type="button" data-f="madeira">馬德拉</button>
+    </div>
+    <div id="map"></div>
+  </section>
+
+  <section id="transport">
+    <h2 class="section-title">怎麼去：交通簡述</h2>
+    <p class="section-sub">每個節點下方都有該地的交通提示；這裡先給整體概念。班次與票價常有調整，出發前請以官方網站與售票處資訊為準。</p>
+    <div class="tr-grid">
+      <div class="tr-card"><h3>✈️ 飛機：本島與島嶼</h3><p>三大門戶是里斯本（LIS）、波爾圖（OPO）與法魯（FAO）。到馬德拉豐沙爾（FNC）約 1.5–1.75 小時，到亞速爾聖米格爾島（PDL）約 2.5 小時；亞速爾各島之間再搭小飛機或夏季渡輪。</p></div>
+      <div class="tr-card"><h3>🚆 火車：城市與近郊</h3><p>里斯本—波爾圖有快速列車（約 3 小時）；波爾圖或里斯本到布拉加、吉馬良斯都有火車。里斯本近郊線可到卡斯凱什（Cais do Sodré 出發）與辛特拉（Rossio 出發），各約 35–40 分鐘。</p></div>
+      <div class="tr-card"><h3>🚌 長途巴士：火車不到的地方</h3><p>納札雷、奧比多斯、巴塔利亞與阿連特茹海岸、阿爾加維多半靠 Rede Expressos 或 FlixBus 等長途巴士，里斯本 Sete Rios、Campo Grande 是主要發車站，車程約 1–4 小時。</p></div>
+      <div class="tr-card"><h3>🚗 租車：內陸與海岸小村</h3><p>蒙桑圖、海上磨坊村、阿連特茹海岸與亞速爾、馬德拉的山海景點，公共運輸班次少，租車最自由。多數高速公路採電子收費，租車時建議一併確認收費方案。</p></div>
+      <div class="tr-card"><h3>🚋 城市內：電車、地鐵與纜車</h3><p>里斯本有地鐵、電車（28 號最有名）、公車與纜索電車，坡多，鞋子要好走；辛特拉山上有 434 號環線公車串起摩爾人城堡與佩納宮；波爾圖與布拉加市區以步行為主。</p></div>
+    </div>
+    <div class="routes">
+      <b>串聯建議（依影片順序拆成幾條線）：</b>
+      <ul>
+        <li><b>大里斯本一日到兩日：</b>里斯本市區（含貝倫區）＋ 辛特拉山區 ＋ 卡斯凱什與羅卡角海岸。</li>
+        <li><b>中部一日遊：</b>奧比多斯 → 納札雷 → 巴塔利亞（多為長途巴士或自駕串連）。</li>
+        <li><b>北部兩日：</b>波爾圖出發 → 布拉加（教堂與朝聖所）→ 吉馬良斯。</li>
+        <li><b>南部與內陸：</b>阿爾加維與阿連特茹海岸、蒙桑圖，都建議租車並預留整天。</li>
+        <li><b>島嶼另外安排：</b>亞速爾與馬德拉都是獨立行程，各自至少預留 3–5 天。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="nodes">
+    <h2 class="section-title">節點巡禮：依影片順序</h2>
+    <p class="section-sub">編號是影片出現順序，不代表評比；序章與尾聲另外放在最前與最後。每個節點右上（或左上）的色塊標示所屬地區。</p>
+    
+    <article class="node special" id="n-prologue">
+      <div class="node-media"><div class="photo"><img loading="lazy" src="images/prologue.jpg" alt="未標註地點的開場"><span class="region-tag" style="background:#555">序章 · 開場預告</span></div>
+        <button class="vframe" type="button" data-start="10" data-end="110" aria-label="就地播放「未標註地點的開場」這一段影片">
+          <img loading="lazy" src="images/v/prologue.jpg" alt="影片畫面：未標註地點的開場">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 00:10–01:50　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Deensel（CC BY 2.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">序章 · 開場預告</div>
+        <h2>未標註地點的開場 <span class="en-inline">Prologue</span></h2>
+        <p>影片前 1 分半沒有地點標籤，而是一段快節奏的「預告」：先在波爾圖的杜羅河上空掠過路易一世大橋（Ponte Dom Luís I）——這座雙層鋼拱橋橫跨波爾圖與新蓋亞之間的杜羅河，建成時 172 公尺的跨距是同類橋梁中的世界之最；上層現在供行人與地鐵 D 線通行，下層則供公車、計程車、單車與行人使用。</p><p>接著畫面依序閃過辛特拉的摩爾人城堡（約 0:50）、蒙桑圖的巨石山村（約 1:00）、一座森林裡的宮殿式建築（約 1:10，我推測是布薩科宮殿酒店）、七城湖（約 1:20）與阿爾加維的海蝕洞（約 1:30），最後轉黑、進入正片。這幾個場景之後都會在本頁「正式登場」；波爾圖只在片頭出現，影片沒有替它安排獨立段落。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>波爾圖路易一世大橋與杜羅河兩岸、河口沙洲、階梯小巷、山頂現代教堂、摩爾人城堡、蒙桑圖、森林宮殿、七城湖、阿爾加維海蝕洞。</div>
+        <div class="transport">✈️ 波爾圖機場（OPO）搭地鐵 E 線約 30 分鐘到市中心；路易一世大橋位在河岸區，步行即可上橋。</div>
+        <div class="actions"><a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=10" target="_blank" rel="noopener">▶ 影片 00:10 這裡開始（約 1 分 40 秒）</a></div>
+      </div>
+    </article>
+    
+    <article class="node " id="n-sete" data-region="azores">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/sete.jpg" alt="聖米格爾島七城湖火山口中碧藍的湖面與翠綠山坡" style="object-position:50% 50%">
+          <div class="rank-badge">1</div>
+          <span class="region-tag" style="background:#1f8a70">亞速爾群島</span>
+        </div>
+        <button class="vframe" type="button" data-start="110" data-end="254" aria-label="就地播放「七城湖」這一段影片">
+          <img loading="lazy" src="images/v/sete.jpg" alt="影片畫面：七城湖">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 01:50–04:14　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Lacobrigo（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 亞速爾 · 聖米格爾島 São Miguel</div>
+        <h2>七城湖 <span class="en-inline">Sete Cidades</span></h2>
+        <div class="en-name">37°51′18″N 25°47′11″W</div>
+        <div class="facts"><span>🌋 休眠火山口雙湖</span><span>💧 亞速爾最大水體</span><span>🌉 兩湖之間有一座小橋</span></div>
+        <p>七城湖（Lagoa das Sete Cidades）位在聖米格爾島西部一座休眠火山的火山口裡，是由兩座水色不同的小湖組成的「雙生湖」，中間只隔著一道狹窄水道，上面架著一座小橋。它是整個亞速爾群島最大的水體，也是島上重要的淡水資源之一，被劃為具有共同體重要性的自然景觀區。</p><p>影片在這裡拍得很久：從火山口邊緣的公路與牧草地緩緩升空，看到藍、綠兩色的湖面被火山壁環抱，旁邊還有更小的火山口湖。當地流傳著一則傳說——公主與牧羊人被拆散後，兩人的淚水匯成了一藍一綠的湖；至於科學上的解釋，常見的說法是兩湖的水深與藻類含量不同，看起來的顏色也就不一樣。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>火山口雙湖空拍、湖畔公路與牧場、火山口內的小湖。</div>
+        <div class="trivia"><b>冷知識：</b>七城湖在影片裡出現了三次：1:50 的正式登場、1:20 開場預告，以及 76 分鐘後的尾聲回顧——導演顯然把它當成整部片的「第一印象」。</div>
+        <div class="transport">✈️ 從里斯本或波爾圖飛抵聖米格爾島的蓬塔德爾加達（PDL）約 2.5 小時；再自駕或跟團約 30–40 分鐘可到火山口邊緣的觀景台。島上大眾運輸班次有限，租車最自由。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=110" target="_blank" rel="noopener">▶ 影片 01:50 這裡登場（約 2 分 24 秒）</a>
+          <button class="map-link" type="button" data-fly="sete">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-portomoniz" data-region="madeira">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/portomoniz.jpg" alt="馬德拉莫尼斯港的小鎮、海岸與外海的黑色小島" style="object-position:50% 50%">
+          <div class="rank-badge">2</div>
+          <span class="region-tag" style="background:#d9822b">馬德拉群島</span>
+        </div>
+        <button class="vframe" type="button" data-start="254" data-end="418" aria-label="就地播放「莫尼斯港」這一段影片">
+          <img loading="lazy" src="images/v/portomoniz.jpg" alt="影片畫面：莫尼斯港">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 04:14–06:58　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Bjørn Christian Tørrissen（CC BY-SA 3.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 馬德拉 · 島嶼西北角</div>
+        <h2>莫尼斯港 <span class="en-inline">Porto Moniz</span></h2>
+        <div class="en-name">32°52′03″N 17°10′11″W</div>
+        <div class="facts"><span>👥 2011 年人口 2,711</span><span>📐 轄區 82.93 平方公里</span><span>🌊 天然熔岩泳池</span></div>
+        <p>莫尼斯港位在馬德拉主島的西北角，行政上是一個轄區（municipality），面積約 83 平方公里，2011 年人口只有 2,711 人。這裡最有名的，是火山熔岩流入海後留下、被海水一再切割成的一整片天然熔岩泳池。如今池畔經過整修，成了兼具安全與野趣的海水浴場。</p><p>影片先用高空鏡頭拍下海邊的小島與小鎮，再切到浪花撞擊黑色岩岸的畫面——這裡的海況變化很大，晴天可以泡進池子裡，浪大的日子則能看到白浪把整片池區包圍。往山谷內走，還有一大段梯田與山間小村的畫面，呈現馬德拉「山與海一線相連」的地形。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>熔岩池與外海小島的空拍、浪打岩岸的特寫、山谷梯田與小村。</div>
+        <div class="trivia"><b>冷知識：</b>馬德拉的地形是「先長高、再被海侵蝕」，所以島的北岸幾乎都是陡峭海崖；莫尼斯港是少數能安全走到海邊的平緩岩岸，這也是熔岩池能成為景點的原因。</div>
+        <div class="transport">✈️ 里斯本／波爾圖飛豐沙爾（FNC）約 1.5–1.75 小時；豐沙爾自駕沿高速公路與隧道約 1–1.5 小時可到莫尼斯港。公車可行但較慢，多數人選擇一日租車環島。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=254" target="_blank" rel="noopener">▶ 影片 04:14 這裡登場（約 2 分 44 秒）</a>
+          <button class="map-link" type="button" data-fly="portomoniz">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-azores" data-region="azores">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/azores.jpg" alt="亞速爾科爾武島 Vila do Corvo 的海岸小鎮與火山地形" style="object-position:50% 50%">
+          <div class="rank-badge">3</div>
+          <span class="region-tag" style="background:#1f8a70">亞速爾群島</span>
+        </div>
+        <button class="vframe" type="button" data-start="418" data-end="618" aria-label="就地播放「亞速爾群島（多島合集）」這一段影片">
+          <img loading="lazy" src="images/v/azores.jpg" alt="影片畫面：亞速爾群島（多島合集）">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 06:58–10:18　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Jules Verne Times Two（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 亞速爾群島</div>
+        <h2>亞速爾群島（多島合集） <span class="en-inline">Azores</span></h2>
+        <div class="en-name">39°33′36″N 31°07′12″W</div>
+        <div class="facts"><span>🏝️ 9 座火山島</span><span>📏 距葡萄牙本土約 1,400 公里</span><span>⛰️ 皮庫山 2,351 公尺</span></div>
+        <p>亞速爾是位在大西洋中的葡萄牙自治區，距離本土約 1,400 公里，由 9 座火山島組成，分成西群（弗洛雷斯、科爾武）、中群（格拉西奧薩、特爾賽拉、聖若熱、皮庫、法亞爾）與東群（聖米格爾、聖瑪麗亞）三組，沿西北—東南方向延伸超過 600 公里。位在皮庫島的皮庫山高 2,351 公尺，是整個葡萄牙的最高點。</p><p>影片這一段（約 7 分到 10 分）只在畫面左下角標示「Azores」，沒有指出是哪一座島。就畫面比對，前半段像是最西邊的科爾武島（山坡下的小村與海灣）與弗洛雷斯島（海崖旁的農田與白屋），之後則是一格一格用石牆圍起來的綠色牧場——這些島名是我依畫面推測的，請把它當作看片時的參考，而不是官方標註。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>科爾武島海灣小村、弗洛雷斯島海崖農田、黑色熔岩海岸與白色小燈塔、大片方格牧場與火山口森林。</div>
+        <div class="trivia"><b>冷知識：</b>亞速爾的牧場被火山岩或樹籬隔成一塊塊方格，一年四季都是綠色，也是島上乳牛與乳酪產業的根基，所以空拍看起來像一張綠色棋盤。</div>
+        <div class="transport">✈️ 里斯本／波爾圖有直飛聖米格爾、特爾賽拉、法亞爾、皮庫等島；島與島之間可搭 SATA Air Açores 小飛機，夏季另有渡輪。科爾武島只能經弗洛雷斯島轉小飛機抵達，行程要預留彈性。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=418" target="_blank" rel="noopener">▶ 影片 06:58 這裡登場（約 3 分 20 秒）</a>
+          <button class="map-link" type="button" data-fly="azores">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-lisbon" data-region="lisbon">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/lisbon.jpg" alt="從高處俯瞰里斯本老城區紅瓦屋頂與太加斯河" style="object-position:50% 50%">
+          <div class="rank-badge">4</div>
+          <span class="region-tag" style="background:#c1502e">里斯本</span>
+        </div>
+        <button class="vframe" type="button" data-start="618" data-end="796" aria-label="就地播放「里斯本」這一段影片">
+          <img loading="lazy" src="images/v/lisbon.jpg" alt="影片畫面：里斯本">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 10:18–13:16　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Vitor Oliveira（CC BY-SA 2.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本 Lisboa</div>
+        <h2>里斯本 <span class="en-inline">Lisbon</span></h2>
+        <div class="en-name">38°43′31″N 9°09′00″W</div>
+        <div class="facts"><span>👥 市區約 65.8 萬人（2025）</span><span>🌆 都會區約 335 萬人</span><span>🏛️ 歐洲第二古老的首都</span></div>
+        <p>里斯本坐落在太加斯河（Tagus）北岸，面向大西洋，是葡萄牙的首都與最大城市，市區約 65.8 萬人，都會區約 335 萬人。它是歐洲最古老的城市之一，也是僅次於雅典的第二古老的歐洲首都：先由前凱爾特部落與腓尼基人建城，羅馬時代稱為 Olisipo，8 世紀被摩爾人占領，1147 年由阿方索・恩里克斯（Afonso Henriques）收復，1255 年取代科英布拉成為首都。</p><p>這一段影片是整部片的「城市序曲」：夜色中的 4 月 25 日大橋與河口貨櫃碼頭、遠處張開雙臂的基督像（Cristo Rei）、有銅像與噴泉的廣場、被陽光曬成鵝黃色的老街、電車軌道與街燈，最後切到海岸礁石與燈塔。四月二十五日大橋原本以獨裁者之名命名，1974 年康乃馨革命後改成現名，紀念那一天。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>4 月 25 日大橋夜景、河口碼頭、基督像、銅像廣場、街巷與電車、海岸礁石燈塔。</div>
+        <div class="trivia"><b>冷知識：</b>里斯本所在的大都會區西端，就是歐洲大陸的最西點——本頁最後一站羅卡角（Cabo da Roca）；從市中心搭車不到一小時就能站在「歐洲的盡頭」。</div>
+        <div class="transport">✈️ 里斯本機場（LIS）搭紅線地鐵約 20–25 分鐘到市中心。市區以地鐵、電車、公車與纜索電車為主；景點多在上坡，建議穿好走的鞋，觀光旺季電車 28 號常大排長龍。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=618" target="_blank" rel="noopener">▶ 影片 10:18 這裡登場（約 2 分 58 秒）</a>
+          <button class="map-link" type="button" data-fly="lisbon">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-jeronimos" data-region="lisbon">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/jeronimos.jpg" alt="熱羅尼莫斯修道院南門精雕細琢的曼努埃爾式立面" style="object-position:50% 30%">
+          <div class="rank-badge">5</div>
+          <span class="region-tag" style="background:#c1502e">里斯本</span>
+        </div>
+        <button class="vframe" type="button" data-start="796" data-end="894" aria-label="就地播放「熱羅尼莫斯修道院」這一段影片">
+          <img loading="lazy" src="images/v/jeronimos.jpg" alt="影片畫面：熱羅尼莫斯修道院">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 13:16–14:54　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Ingo Mehling（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本 · 貝倫區 Belém</div>
+        <h2>熱羅尼莫斯修道院 <span class="en-inline">Jerónimos Monastery</span></h2>
+        <div class="en-name">38°41′52″N 9°12′22″W</div>
+        <div class="facts"><span>🏛️ UNESCO 世界遺產（1983）</span><span>⚓ 曼努埃爾式建築代表</span><span>👑 阿維斯王朝陵寢</span></div>
+        <p>熱羅尼莫斯修道院建於 16 世紀初，位置就在瓦斯科・達伽馬（Vasco da Gama）首航印度出發的港口旁；興建經費來自每年前往印度的艦隊利潤所徵的稅，因此整座建築可以說是「大航海時代的收據」。它是葡萄牙晚期哥德式「曼努埃爾風格」（Manueline）最經典的作品之一，1983 年與貝倫塔一起列為世界遺產。</p><p>教堂內收著阿維斯王朝（Aviz）國王們的陵寢；1880 年，達伽馬與寫下《葡萄牙人之歌》讚頌他航行的詩人卡蒙斯（Luís de Camões）的遺骨也移入教堂中殿，與曼努埃爾一世、若昂三世的墓相距只有幾公尺。影片先用平視鏡頭拍南門的層層繩索、貝殼與海洋雕飾，再用夜景燈光與高空鏡頭展現整座修道院的長度。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>正面平視、南門雕飾特寫、夜間打光、空拍長廊與周邊街區。</div>
+        <div class="trivia"><b>冷知識：</b>修道院在 1833 年 12 月 28 日因國家法令世俗化，之後產權轉給里斯本的慈善機構「Real Casa Pia」——一座修道院的命運，被納進了自由主義革命的浪潮。</div>
+        <div class="transport">🚋 從里斯本市區搭 15E 電車，或在 Cais do Sodré 搭 CP 通勤火車到 Belém 站（約 7–10 分鐘）；出站步行 5 分鐘。旺季排隊人潮多，建議早上一開門就到。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=796" target="_blank" rel="noopener">▶ 影片 13:16 這裡登場（約 1 分 38 秒）</a>
+          <button class="map-link" type="button" data-fly="jeronimos">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-belem" data-region="lisbon">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/belem.jpg" alt="太加斯河畔的貝倫塔，石造塔身與河面倒影" style="object-position:50% 30%">
+          <div class="rank-badge">6</div>
+          <span class="region-tag" style="background:#c1502e">里斯本</span>
+        </div>
+        <button class="vframe" type="button" data-start="894" data-end="1044" aria-label="就地播放「貝倫塔」這一段影片">
+          <img loading="lazy" src="images/v/belem.jpg" alt="影片畫面：貝倫塔">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 14:54–17:24　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Alvesgaspar（CC BY-SA 3.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本 · 貝倫區 Belém</div>
+        <h2>貝倫塔 <span class="en-inline">Belém Tower</span></h2>
+        <div class="en-name">38°41′30″N 9°12′58″W</div>
+        <div class="facts"><span>🏛️ UNESCO 世界遺產（1983）</span><span>📏 塔高約 30 公尺、四層</span><span>🧱 里歐茲石灰岩</span></div>
+        <p>貝倫塔正式名稱是「聖文森塔」（Torre de São Vicente），是 16 世紀的防禦工事，同時也是葡萄牙探險家出港與返港的象徵性大門。由一座棱堡與四層、高約 30 公尺的塔樓組成，使用里斯本本地的里歐茲（lioz）石灰岩砌成；塔上的小圓頂帶有摩爾建築的影子，與繩結、十字架、犀牛等曼努埃爾式雕飾混在一起。</p><p>影片從日落前的河面拍起，金黃色的塔影倒映在太加斯河裡，接著用空拍拉遠，才看得出塔與河岸、步道之間的關係——坊間常說貝倫塔原本蓋在河中央、後來河道改變才變成靠岸，維基百科特別指出這種說法並不正確，可以當成參觀時的小提醒。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>黃昏河面上的貝倫塔、河岸步道與碼頭、不同高度的空拍。</div>
+        <div class="trivia"><b>冷知識：</b>貝倫塔在 1983 年與熱羅尼莫斯修道院一起被列為世界遺產，兩者之間的距離只有大約十分鐘步行，是「大航海時代」最好走的一日行程。</div>
+        <div class="transport">🚋 與熱羅尼莫斯修道院同一區：15E 電車、CP 通勤線 Belém 站，或公車 728；從修道院沿河邊步行約 15 分鐘。日落時刻光線最漂亮，但人也最多。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=894" target="_blank" rel="noopener">▶ 影片 14:54 這裡登場（約 2 分 30 秒）</a>
+          <button class="map-link" type="button" data-fly="belem">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-comercio" data-region="lisbon">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/comercio.jpg" alt="里斯本商業廣場的凱旋門與鵝黃色拱廊建築" style="object-position:50% 50%">
+          <div class="rank-badge">7</div>
+          <span class="region-tag" style="background:#c1502e">里斯本</span>
+        </div>
+        <button class="vframe" type="button" data-start="1044" data-end="1154" aria-label="就地播放「商業廣場」這一段影片">
+          <img loading="lazy" src="images/v/comercio.jpg" alt="影片畫面：商業廣場">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 17:24–19:14　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Bernard Gagnon（CC BY 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本 · 巴伊沙區 Baixa</div>
+        <h2>商業廣場 <span class="en-inline">Praça do Comércio</span></h2>
+        <div class="en-name">38°42′27″N 9°08′11″W</div>
+        <div class="facts"><span>📐 175 × 175 公尺</span><span>🏙️ 1755 大地震後重建</span><span>🚇 地下就是地鐵站</span></div>
+        <p>商業廣場（Praça do Comércio，本地人多半稱它「宮廷廣場」Terreiro do Paço）面朝太加斯河，是葡萄牙最大的廣場之一，邊長 175 公尺、面積約 3 萬平方公尺。1755 年里斯本大地震以前，這裡是國王居住的里貝拉宮；地震與海嘯將宮殿摧毀，廣場才在龐巴爾侯爵主導的重建計畫中被完整改造。</p><p>廣場三面是鵝黃色的拱廊建築，過去是財政、內政、農業與海事等國家部會所在地，如今大半成了咖啡館與博物館；北側正中間的凱旋門通向奧古斯塔街。廣場中央騎馬的銅像是國王若澤一世，影片用俯拍與低角度輪流呈現廣場的對稱之美，並用延時攝影在尾聲回顧一次。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>凱旋門、騎馬銅像、廣場俯拍、河岸階梯與人群。</div>
+        <div class="trivia"><b>冷知識：</b>廣場地下正是「Terreiro do Paço」地鐵站——所以這一站的名字保留的是舊稱，而不是現在大家習慣叫的「商業廣場」。</div>
+        <div class="transport">🚇 搭地鐵藍線到 Terreiro do Paço 站，出站即到；從羅西歐廣場沿奧古斯塔街步行約 10 分鐘。也可以從 Cais do Sodré 步行過來，或從對岸搭渡輪抵達。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=1044" target="_blank" rel="noopener">▶ 影片 17:24 這裡登場（約 1 分 50 秒）</a>
+          <button class="map-link" type="button" data-fly="comercio">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-alfama" data-region="lisbon">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/alfama.jpg" alt="從觀景台俯瞰阿爾法瑪的紅屋頂、教堂與太加斯河" style="object-position:50% 50%">
+          <div class="rank-badge">8</div>
+          <span class="region-tag" style="background:#c1502e">里斯本</span>
+        </div>
+        <button class="vframe" type="button" data-start="1154" data-end="1256" aria-label="就地播放「阿爾法瑪」這一段影片">
+          <img loading="lazy" src="images/v/alfama.jpg" alt="影片畫面：阿爾法瑪">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 19:14–20:56　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Dale Cruse（CC BY 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本 · 舊城</div>
+        <h2>阿爾法瑪 <span class="en-inline">Alfama District</span></h2>
+        <div class="en-name">38°42′44″N 9°07′48″W</div>
+        <div class="facts"><span>🏘️ 里斯本最古老的街區</span><span>🎶 法朵（Fado）發源地</span><span>🚋 電車 28 號沿線</span></div>
+        <p>阿爾法瑪是里斯本最古老的街區，鋪展在聖若熱城堡與太加斯河之間的斜坡上，範圍涵蓋聖米格爾、聖埃斯特旺、聖文森特德福拉等教區。迷宮般的狹窄巷弄與階梯保留了摩爾人時代的城市紋理，也是法朵（Fado）小酒館最密集的地方——夜裡循著吉他聲走進去，就是傳統的里斯本。</p><p>影片在這裡用大量空拍呈現紅瓦屋頂層層疊疊往河邊流去的畫面；畫面中那座白色圓頂建築是國家先賢祠（Panteão Nacional）。阿爾法瑪被當成「里斯本最像老里斯本的一區」，因為 1755 年的大地震對這裡的破壞比低窪的巴伊沙區輕，舊街道保存得比較完整。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>觀景台望出去的紅瓦屋頂、教堂與白色圓頂、河岸與郵輪。</div>
+        <div class="trivia"><b>冷知識：</b>阿爾法瑪的名字來自阿拉伯語，意思大致是「溫泉」或「澡堂」——這也是這區曾經被摩爾人統治的痕跡。</div>
+        <div class="transport">🚋 搭傳奇的 28 號電車最有氣氛，但人多；也可搭地鐵藍線到 Santa Apolónia 站，再往上坡走。想拍街景建議從聖露西亞或太陽門（Portas do Sol）觀景台開始。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=1154" target="_blank" rel="noopener">▶ 影片 19:14 這裡登場（約 1 分 42 秒）</a>
+          <button class="map-link" type="button" data-fly="alfama">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-saojorge" data-region="lisbon">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/saojorge.jpg" alt="里斯本聖若熱城堡的石造塔樓與城牆" style="object-position:50% 50%">
+          <div class="rank-badge">9</div>
+          <span class="region-tag" style="background:#c1502e">里斯本</span>
+        </div>
+        <button class="vframe" type="button" data-start="1256" data-end="1352" aria-label="就地播放「聖若熱城堡」這一段影片">
+          <img loading="lazy" src="images/v/saojorge.jpg" alt="影片畫面：聖若熱城堡">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 20:56–22:32　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 fulviusbsas（CC BY-SA 3.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本 · 城堡山</div>
+        <h2>聖若熱城堡 <span class="en-inline">São Jorge Castle</span></h2>
+        <div class="en-name">38°42′50″N 9°08′01″W</div>
+        <div class="facts"><span>🏰 最古老防禦工事約前 2 世紀</span><span>⚔️ 1147 年圍城戰</span><span>🏛️ 曾是王宮、兵營與檔案館</span></div>
+        <p>聖若熱城堡所在的山頭，至少從西元前 8 世紀起就有人居住，最古老的防禦工事可以追溯到前 2 世紀。這座山依序被腓尼基人、迦太基人、羅馬人與摩爾人占據，1147 年阿方索・恩里克斯的軍隊在里斯本圍城戰中攻下這裡，從此成為葡萄牙王國的中心。</p><p>12 世紀起，這座城堡曾當過王宮、軍營，也是國家檔案館 Torre do Tombo 的所在地，現在則是國家紀念建築與博物館。影片把城堡拍成一座被松樹與紅瓦包圍的綠色島嶼，並特寫飄揚在城牆上的葡萄牙國旗與遠方河口。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>城牆、庭院與樹林、國旗、空拍城堡山與周邊紅瓦街區。</div>
+        <div class="trivia"><b>冷知識：</b>城堡以「聖若熱」（聖喬治）為名，一般認為與葡萄牙和英格蘭的古老同盟、以及聖喬治成為軍隊守護聖人的傳統有關；細節說法不一，比較保險的理解是：這個名字不是城堡最初就有的。</div>
+        <div class="transport">🚋 搭 28 號電車或公車 737 上山，再步行一小段到城堡入口；從阿爾法瑪往上爬也很順路。想避開排隊，開門時間到最好。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=1256" target="_blank" rel="noopener">▶ 影片 20:56 這裡登場（約 1 分 36 秒）</a>
+          <button class="map-link" type="button" data-fly="saojorge">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-rossio" data-region="lisbon">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/rossio.jpg" alt="羅西歐廣場的波浪紋鋪面、噴泉與佩德羅四世紀念柱" style="object-position:50% 50%">
+          <div class="rank-badge">10</div>
+          <span class="region-tag" style="background:#c1502e">里斯本</span>
+        </div>
+        <button class="vframe" type="button" data-start="1352" data-end="1446" aria-label="就地播放「羅西歐廣場」這一段影片">
+          <img loading="lazy" src="images/v/rossio.jpg" alt="影片畫面：羅西歐廣場">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 22:32–24:06　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Thomas from Vienna（CC BY 2.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本 · 巴伊沙區</div>
+        <h2>羅西歐廣場 <span class="en-inline">Rossio Square</span></h2>
+        <div class="en-name">38°42′50″N 9°08′22″W</div>
+        <div class="facts"><span>📍 龐巴爾式下城核心</span><span>🌊 波浪紋黑白鋪面</span><span>🗿 佩德羅四世紀念柱</span></div>
+        <p>羅西歐廣場正式名稱是「佩德羅四世廣場」，從中世紀起就是里斯本最主要的公共廣場之一。它見證過民眾起義與慶典，也上演過鬥牛與處決；如今是本地人與旅客都愛的碰面點。廣場中央的高柱上，站著以此地為名的國王佩德羅四世（同時也是巴西皇帝佩德羅一世）。</p><p>影片先來一段正上方的俯拍——黑白碎石拼成的波浪紋鋪面、兩座對稱的噴泉、廣場四周的車流，看起來像一幅平面設計；接著再用低空環繞展示北側的瑪麗亞二世國家劇院（Teatro Nacional D. Maria II）與周邊街景。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>正上方俯拍鋪面與噴泉、國家劇院、周邊街道與老城屋頂。</div>
+        <div class="trivia"><b>冷知識：</b>這種黑白小石塊手鋪的「葡萄牙石鋪面」（calçada portuguesa）是葡萄牙傳統工藝，工人一顆一顆用槌子敲進沙地裡；羅西歐的波浪紋還被稱為「大海」圖案，呼應這個國家的海洋性格。</div>
+        <div class="transport">🚇 地鐵綠線 Rossio 站或藍線 Restauradores 站，出站即到；旁邊的 Rossio 火車站就是前往辛特拉的通勤線起點。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=1352" target="_blank" rel="noopener">▶ 影片 22:32 這裡登場（約 1 分 34 秒）</a>
+          <button class="map-link" type="button" data-fly="rossio">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-cascais" data-region="coast">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/cascais.jpg" alt="卡斯凱什海岸的聖塔瑪爾塔燈塔與老宅" style="object-position:50% 50%">
+          <div class="rank-badge">11</div>
+          <span class="region-tag" style="background:#8e5ea2">里斯本海岸與辛特拉</span>
+        </div>
+        <button class="vframe" type="button" data-start="1446" data-end="1652" aria-label="就地播放「卡斯凱什」這一段影片">
+          <img loading="lazy" src="images/v/cascais.jpg" alt="影片畫面：卡斯凱什">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 24:06–27:32　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Jorge Franganillo（CC BY 2.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本大區 · 埃什托里爾海岸</div>
+        <h2>卡斯凱什 <span class="en-inline">Cascais</span></h2>
+        <div class="en-name">38°41′52″N 9°25′17″W</div>
+        <div class="facts"><span>👥 轄區約 21.4 萬人</span><span>⛵ 遊艇碼頭</span><span>👑 王室與名流度假地</span></div>
+        <p>卡斯凱什是埃什托里爾海岸（Estoril Coast）上的海濱城鎮，轄區約 21.4 萬人。從 1870 年代起，國王路易士一世（Luís I）與王室每年 9 月都來這裡避暑，貴族們隨之興建夏日別墅，小漁港也就變成了度假勝地。後來英國愛德華八世（溫莎公爵）、西班牙的胡安・卡洛斯一世、義大利的翁貝托二世都曾在這裡居住。</p><p>影片先切入海邊灰白色的老建築與遊艇碼頭，再用夜間空拍展示沿岸燈火與摩天輪，之後是聖塔瑪爾塔燈塔與海濱步道。碼頭曾舉辦美洲盃帆船賽的活動；附近的埃什托里爾賭場（Casino Estoril）則是伊恩・佛萊明寫《皇家夜總會》的靈感來源。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>遊艇碼頭、海濱老宅、夜間空拍、燈塔與海邊公路。</div>
+        <div class="trivia"><b>冷知識：</b>卡斯凱什是葡萄牙也是伊比利半島最富裕的行政區之一；今天很多人從里斯本搭一趟通勤火車來，就是為了在海邊吃午餐、租腳踏車騎到羅卡角方向。</div>
+        <div class="transport">🚆 在里斯本 Cais do Sodré 搭 CP 卡斯凱什線通勤火車，約 35–40 分鐘直達終點站，沿途可看到大西洋與貝倫塔；再步行到海邊、碼頭與老城。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=1446" target="_blank" rel="noopener">▶ 影片 24:06 這裡登場（約 3 分 26 秒）</a>
+          <button class="map-link" type="button" data-fly="cascais">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-madeira" data-region="madeira">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/madeira.jpg" alt="馬德拉聖洛倫索半島紅褐色的海崖與蔚藍海面" style="object-position:50% 50%">
+          <div class="rank-badge">12</div>
+          <span class="region-tag" style="background:#d9822b">馬德拉群島</span>
+        </div>
+        <button class="vframe" type="button" data-start="1652" data-end="1852" aria-label="就地播放「馬德拉（島嶼風光）」這一段影片">
+          <img loading="lazy" src="images/v/madeira.jpg" alt="影片畫面：馬德拉（島嶼風光）">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 27:32–30:52　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Diego Delso（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 馬德拉群島</div>
+        <h2>馬德拉（島嶼風光） <span class="en-inline">Madeira</span></h2>
+        <div class="en-name">32°44′42″N 16°42′00″W</div>
+        <div class="facts"><span>📏 距葡萄牙本土約 805 公里</span><span>👥 2021 年約 25.1 萬人</span><span>🏙️ 首府豐沙爾</span></div>
+        <p>馬德拉群島位在大西洋，距葡萄牙本土西南約 805 公里、加那利群島北方不到 400 公里，是葡萄牙的另一個自治區，2021 年人口約 25.1 萬，一半住在首府豐沙爾（Funchal）。群島包含馬德拉主島、聖港島（Porto Santo）、無人居住的德塞塔斯群島，以及行政上合併管理的野蠻群島。</p><p>這段影片標示只寫「Madeira」，但畫面依序帶過主島東緣紅褐色岩壁的聖洛倫索半島（Ponta de São Lourenço）、卡尼薩爾附近的遊艇碼頭、海蝕拱門、山谷裡的水渠（levada）、瀑布與北海岸的塞沙爾（Seixal）——以上地名是我依畫面比對推測的。馬德拉的魅力就在於：短短一小時車程之內，從紅色火山岩到亞熱帶雲霧森林全部看得到。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>紅褐色海崖、遊艇碼頭、海蝕拱門、山谷水渠、瀑布與北海岸小村。</div>
+        <div class="trivia"><b>冷知識：</b>馬德拉島上縱橫交錯的水渠「levada」是幾百年來灌溉用的人工水道，旁邊的小徑現在成了熱門健行路線——許多影片畫面裡的那條「筆直的石槽」就是它。</div>
+        <div class="transport">✈️ 從里斯本或波爾圖飛豐沙爾（FNC）約 1.5–1.75 小時。島上山路與隧道多，租車最方便；聖洛倫索半島步道來回約 8 公里，建議早出發、帶足水與防風外套。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=1652" target="_blank" rel="noopener">▶ 影片 27:32 這裡登場（約 3 分 20 秒）</a>
+          <button class="map-link" type="button" data-fly="madeira">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-nazare" data-region="central">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/nazare.jpg" alt="納札雷北灘巨浪湧向海岬上的要塞與紅色燈塔" style="object-position:50% 50%">
+          <div class="rank-badge">13</div>
+          <span class="region-tag" style="background:#b8892a">中部</span>
+        </div>
+        <button class="vframe" type="button" data-start="1852" data-end="2042" aria-label="就地播放「納札雷」這一段影片">
+          <img loading="lazy" src="images/v/nazare.jpg" alt="影片畫面：納札雷">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 30:52–34:02　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Luis Ascenso（CC BY 2.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 中部 · 白銀海岸</div>
+        <h2>納札雷 <span class="en-inline">Nazaré</span></h2>
+        <div class="en-name">39°36′04″N 9°04′14″W</div>
+        <div class="facts"><span>👥 轄區約 1.49 萬人</span><span>🌊 衝浪紀錄 26.2 公尺</span><span>🚠 海灘與高地有纜索鐵道</span></div>
+        <p>納札雷是白銀海岸（Costa de Prata）上最有名的海濱小鎮，轄區約 1.49 萬人，鎮上由三個區塊組成：沿著沙灘的「Praia」、位在懸崖頂上的老村「Sítio」，以及另一個山丘上的老村「Pederneira」，其中 Praia 與 Sítio 之間有纜索鐵道相連。每年 9 月 8 日前後的納札雷聖母節，是一場為期十天、混合宗教與市集的傳統慶典。</p><p>如今納札雷是全球衝浪界的朝聖地：北灘外的海底峽谷會把大西洋的湧浪推高，形成可達數層樓高的巨浪；截至 2026 年，衝浪史上被丈量到的最高浪紀錄，就是 2020 年德國選手塞巴斯提安・史特納（Sebastian Steudtner）在此騎下的 26.2 公尺。影片重點在海岬上的聖米格爾要塞與紅色燈塔、白色浪花、金黃色的沙灘與波狀屋頂的小鎮。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>海岬要塞與燈塔、巨浪撞岩、沙灘與小鎮空拍、日落逆光的岬角。</div>
+        <div class="trivia"><b>冷知識：</b>巨浪季大約在秋天到冬天（10–2 月）；夏天的納札雷反而是平靜的度假海灘，滿街都是曬太陽與吃烤沙丁魚的遊客，兩種面貌截然不同。</div>
+        <div class="transport">🚌 里斯本 Sete Rios 或 Campo Grande 有長途巴士直達，車程約 1.5–2 小時；鎮上沒有火車站（最近的是 Valado dos Frades，需再轉乘）。自駕約 1.25 小時。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=1852" target="_blank" rel="noopener">▶ 影片 30:52 這裡登場（約 3 分 10 秒）</a>
+          <button class="map-link" type="button" data-fly="nazare">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-azenhas" data-region="coast">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/azenhas.jpg" alt="建在大西洋懸崖上的海上磨坊村白色房屋" style="object-position:50% 50%">
+          <div class="rank-badge">14</div>
+          <span class="region-tag" style="background:#8e5ea2">里斯本海岸與辛特拉</span>
+        </div>
+        <button class="vframe" type="button" data-start="2042" data-end="2174" aria-label="就地播放「海上磨坊村」這一段影片">
+          <img loading="lazy" src="images/v/azenhas.jpg" alt="影片畫面：海上磨坊村">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 34:02–36:14　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Husond（CC BY-SA 3.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 辛特拉 · 科拉雷斯教區</div>
+        <h2>海上磨坊村 <span class="en-inline">Azenhas do Mar</span></h2>
+        <div class="en-name">38°50′26″N 9°27′36″W</div>
+        <div class="facts"><span>👥 約 451 人（2017）</span><span>🌊 名字意思是「海的水車」</span><span>🏞️ 辛特拉—卡斯凱什自然公園</span></div>
+        <p>海上磨坊村（Azenhas do Mar）是辛特拉市科拉雷斯教區的一個小村，掛在大西洋懸崖上，位在里斯本西北約 30 公里，2017 年只有 451 位居民。村名「Azenhas do Mar」字面意思是「海之水車」，原本指附近卡梅若溪（Cameijo）沿岸曾用來磨麥子的水磨；20 世紀之後，這裡才變成因為崖邊白屋而聞名的海濱度假村。</p><p>影片的鏡頭從沿海公路慢慢升空，讓崖頂白牆紅瓦的房子、下方的海蝕平台以及一座嵌在岩石上的海水泳池同框：漲潮時浪花會打進泳池，退潮時則是一個能安心泡水的小天地。空拍看起來像是把小鎮「貼」在懸崖上。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>沿海公路、崖頂白牆紅瓦小村、崖邊的海水泳池、逆光的浪花。</div>
+        <div class="trivia"><b>冷知識：</b>這個村子的房子幾乎全部朝向大海，是因為過去的生計都靠海與磨坊；如今則因為畫面太上相，成了社群媒體上「葡萄牙最夢幻的海邊小村」之一。</div>
+        <div class="transport">🚗 從辛特拉自駕約 20–30 分鐘最方便；也有公車前往，但班次有限，出發前先查時刻。周末夏季人多，停車位不好找。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=2042" target="_blank" rel="noopener">▶ 影片 34:02 這裡登場（約 2 分 12 秒）</a>
+          <button class="map-link" type="button" data-fly="azenhas">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-algarve" data-region="south">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/algarve.jpg" alt="阿爾加維海岸的橘黃色懸崖與碧綠海水" style="object-position:50% 50%">
+          <div class="rank-badge">15</div>
+          <span class="region-tag" style="background:#12a4b5">南部</span>
+        </div>
+        <button class="vframe" type="button" data-start="2174" data-end="2342" aria-label="就地播放「阿爾加維海岸」這一段影片">
+          <img loading="lazy" src="images/v/algarve.jpg" alt="影片畫面：阿爾加維海岸">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 36:14–39:02　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Marty B（CC BY-SA 2.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 南部 · 阿爾加維</div>
+        <h2>阿爾加維海岸 <span class="en-inline">Algarve</span></h2>
+        <div class="en-name">37°04′47″N 8°39′58″W</div>
+        <div class="facts"><span>📐 面積約 4,997 平方公里</span><span>👥 常住人口約 46.7 萬</span><span>✈️ 首府法魯（Faro）</span></div>
+        <p>阿爾加維是葡萄牙大陸最南端的區域，面積約 4,997 平方公里，常住人口約 46.7 萬人，行政中心與國際機場都在法魯。整個區域分成西邊的巴爾拉溫圖（Barlavento）與東邊的索塔溫圖（Sotavento）；夏天的經濟主要靠旅遊，此外也生產海鮮、柳橙、無花果、杏仁與酪梨等農產品。</p><p>影片標的「Algarve」其實是一個很大的範圍：畫面上有拉古什（Lagos）一帶被海浪雕出的橘色岩柱、拱門與洞穴，海邊崖頂白色的燈塔（我推測是卡沃埃魯附近的 Farol de Alfanzina），以及在陽光下呈現青綠色的小海灣。橘黃的砂岩懸崖與透明的海水，是這裡最鮮明的識別標誌。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>橘色岩柱與拱門、崖頂燈塔、海灣沙灘、遊艇與海蝕洞。</div>
+        <div class="trivia"><b>冷知識：</b>片頭預告（1:30）和尾聲都出現了同一種海蝕洞穴景觀——那是阿爾加維最受歡迎的「乘船看海蝕洞」行程，搭小艇可以進到穹頂有天窗的洞穴裡。</div>
+        <div class="transport">✈️ 直飛法魯機場（FAO）最省事；也可從里斯本搭火車（約 3.5–4 小時，中途轉乘）或長途巴士（約 3.5–4 小時）到拉古什。海岸景點分散，租車最自由；海蝕洞行程從海灘或碼頭出發。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=2174" target="_blank" rel="noopener">▶ 影片 36:14 這裡登場（約 2 分 48 秒）</a>
+          <button class="map-link" type="button" data-fly="algarve">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-monsanto" data-region="central">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/monsanto.jpg" alt="蒙桑圖村莊的石屋與巨大花崗岩圓石共生" style="object-position:50% 50%">
+          <div class="rank-badge">16</div>
+          <span class="region-tag" style="background:#b8892a">中部</span>
+        </div>
+        <button class="vframe" type="button" data-start="2342" data-end="2554" aria-label="就地播放「蒙桑圖」這一段影片">
+          <img loading="lazy" src="images/v/monsanto.jpg" alt="影片畫面：蒙桑圖">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 39:02–42:34　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Bosc d&#x27;Anjou（CC BY 2.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 中部內陸 · 伊達尼亞新城</div>
+        <h2>蒙桑圖 <span class="en-inline">Monsanto</span></h2>
+        <div class="en-name">40°02′16″N 7°06′53″W</div>
+        <div class="facts"><span>🪨 房子蓋在巨石之間</span><span>🐓 1938 年「最葡萄牙的村莊」</span><span>⛰️ 山高約 758 公尺</span></div>
+        <p>蒙桑圖位在葡萄牙中部內陸、靠近西班牙邊境的高原上，是伊達尼亞新城（Idanha-a-Nova）轄下的花崗岩山村。村民把房子蓋在巨大的圓石之間，有些屋頂乾脆直接頂著巨石，巷弄也順著石頭的縫隙彎曲；山頂上則有一座中世紀城堡的廢墟。</p><p>影片在這裡花了將近三分半：先從遼闊的原野與岩山拉近，再穿進屋頂與教堂鐘樓之間，最後爬到山頂上看城牆與風。1938 年，政府舉辦了一場「最葡萄牙的村莊」競賽，替各省選出 12 座歷史村莊；蒙桑圖此後被通稱為「葡萄牙最葡萄牙的村莊」，據說還與一座銀公雞獎座連在一起，這句稱號也就成了它的招牌。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>遠景高原、圓石間的紅瓦屋頂、教堂鐘樓、山頂城堡與城牆。</div>
+        <div class="trivia"><b>冷知識：</b>因為位在遠離海岸與大城的內陸，蒙桑圖看起來像是另一個國家——這一段很能提醒觀眾：葡萄牙不只有海岸與島嶼，還有大片乾燥、寧靜的高原。</div>
+        <div class="transport">🚗 沒有便利的大眾運輸，建議自駕；從卡斯特洛布蘭科（Castelo Branco）約 1 小時車程。村內是陡坡石階路，請穿防滑的鞋。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=2342" target="_blank" rel="noopener">▶ 影片 39:02 這裡登場（約 3 分 32 秒）</a>
+          <button class="map-link" type="button" data-fly="monsanto">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-sintra" data-region="coast">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/sintra.jpg" alt="辛特拉國家宮的白色建築與兩根圓錐形煙囪" style="object-position:50% 50%">
+          <div class="rank-badge">17</div>
+          <span class="region-tag" style="background:#8e5ea2">里斯本海岸與辛特拉</span>
+        </div>
+        <button class="vframe" type="button" data-start="2554" data-end="2666" aria-label="就地播放「辛特拉」這一段影片">
+          <img loading="lazy" src="images/v/sintra.jpg" alt="影片畫面：辛特拉">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 42:34–44:26　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Berthold Werner（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 里斯本大區 · 辛特拉山</div>
+        <h2>辛特拉 <span class="en-inline">Sintra</span></h2>
+        <div class="en-name">38°47′57″N 9°23′18″W</div>
+        <div class="facts"><span>🏛️ UNESCO 文化景觀</span><span>👥 轄區約 38.6 萬人</span><span>⛲ 國家宮兩根圓錐煙囪</span></div>
+        <p>辛特拉位在辛特拉山（Serra de Sintra）山腳，是葡萄牙王室的傳統夏日度假地，市區一帶的歷史中心、宮殿、城堡與花園因為十九世紀浪漫主義建築而被列為聯合國世界文化景觀。2021 年整個轄區約有 38.6 萬人，是葡萄牙人口最密集的行政區之一。辛特拉的三大地標——摩爾人城堡、佩納宮與辛特拉國家宮，影片都用相當多篇幅介紹。</p><p>這一段的主角是辛特拉國家宮（Palácio Nacional de Sintra）：白色的立面、黃色鑲邊的窗框、有摩爾風格的雙拱窗，屋頂上兩根像「巨大圓錐」的煙囪其實是宮殿的廚房煙囪。它原本是中世紀的王宮，歷代國王反覆擴建，因此混合了多種風格。影片還用空拍顯示這座宮殿與辛特拉舊城的位置關係，以及周邊的房屋與森林。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>國家宮立面與雙圓錐煙囪、舊城屋頂空拍、辛特拉山森林。</div>
+        <div class="trivia"><b>冷知識：</b>拜倫曾在詩裡形容辛特拉如同人間的伊甸園；這也是為什麼十九世紀之後，歐洲貴族與藝術家都爭相在這座山裡蓋別墅與花園。</div>
+        <div class="transport">🚆 里斯本 Rossio 站搭 CP 辛特拉線通勤火車約 40 分鐘，出站步行 10 分鐘即到舊城中心。前往山上景點可搭 434 號環線公車（辛特拉車站 → 摩爾人城堡 → 佩納宮）；旺季建議預訂門票與早點出發。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=2554" target="_blank" rel="noopener">▶ 影片 42:34 這裡登場（約 1 分 52 秒）</a>
+          <button class="map-link" type="button" data-fly="sintra">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-monserrate" data-region="coast">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/monserrate.jpg" alt="辛特拉蒙塞拉特宮的粉色摩爾式圓頂與拱門" style="object-position:50% 50%">
+          <div class="rank-badge">18</div>
+          <span class="region-tag" style="background:#8e5ea2">里斯本海岸與辛特拉</span>
+        </div>
+        <button class="vframe" type="button" data-start="2666" data-end="2750" aria-label="就地播放「蒙塞拉特宮」這一段影片">
+          <img loading="lazy" src="images/v/monserrate.jpg" alt="影片畫面：蒙塞拉特宮">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 44:26–45:50　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Jorge Lobo（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 辛特拉</div>
+        <h2>蒙塞拉特宮 <span class="en-inline">Monserrate Palace</span></h2>
+        <div class="en-name">38°47′39″N 9°25′14″W</div>
+        <div class="facts"><span>🕌 印度—摩爾風格圓頂</span><span>🌿 異國植物園</span><span>🏛️ UNESCO 辛特拉文化景觀</span></div>
+        <p>蒙塞拉特宮是辛特拉山腳下一座「宮殿式別墅」，位在通往大西洋的山坡上，是十九世紀英國商人法蘭西斯・庫克（Francis Cook）改建的夏日別墅，設計融合了摩爾式與印度式的元素：粉紅色的外牆、鑲花邊的拱門，以及讓人聯想到清真寺的圓頂。</p><p>宮殿周圍的園林與宮殿一樣有名：庫克夫婦與園藝家從世界各地引進大量熱帶與溫帶植物，園區一步一景，有蕨類谷、噴泉、瀑布與草坪。影片從高空俯瞰紅色屋頂與粉紅穹頂，再往後退，讓整座宮殿在綠色森林裡「浮」出來，很有一種被森林藏起來的祕密花園感。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>粉紅色圓頂與紅瓦屋頂空拍、庭園草坪與森林。</div>
+        <div class="trivia"><b>冷知識：</b>這片莊園在十八世紀末經歷過幾任外國房客（包括英國作家貝克福德），1809 年拜倫造訪時，莊園仍是一片荒廢，卻依然被它的美打動，在《恰爾德・哈羅德遊記》裡寫下讚美；後來的庫克家族才把它改造成維多利亞時代想像中的東方宮殿。</div>
+        <div class="transport">🚌 從辛特拉車站搭 435 號公車可到蒙塞拉特宮（班次與行程請查 Scotturb 最新資訊）；自駕約 10 分鐘。與佩納宮相反方向，最好單獨安排半天。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=2666" target="_blank" rel="noopener">▶ 影片 44:26 這裡登場（約 1 分 24 秒）</a>
+          <button class="map-link" type="button" data-fly="monserrate">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-regaleira" data-region="coast">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/regaleira.jpg" alt="辛特拉雷加萊拉莊園的哥德式宮殿與熱帶植物花園" style="object-position:50% 50%">
+          <div class="rank-badge">19</div>
+          <span class="region-tag" style="background:#8e5ea2">里斯本海岸與辛特拉</span>
+        </div>
+        <button class="vframe" type="button" data-start="2750" data-end="2874" aria-label="就地播放「雷加萊拉莊園」這一段影片">
+          <img loading="lazy" src="images/v/regaleira.jpg" alt="影片畫面：雷加萊拉莊園">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 45:50–47:54　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Diego Delso（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 辛特拉</div>
+        <h2>雷加萊拉莊園 <span class="en-inline">Quinta da Regaleira</span></h2>
+        <div class="en-name">38°47′47″N 9°23′45″W</div>
+        <div class="facts"><span>🏗️ 1904–1910 建成</span><span>🕳️ 螺旋「啟蒙井」</span><span>🏛️ UNESCO 辛特拉文化景觀</span></div>
+        <p>雷加萊拉莊園建於 1904 到 1910 年間，位在辛特拉歷史中心附近，是浪漫主義風格的宮殿、小教堂，加上一座滿是湖泊、洞窟、水井、長椅與噴泉的豪華花園。因為主人是富豪安東尼奧・奧古斯托・卡瓦略・蒙泰羅（António Augusto Carvalho Monteiro），這裡也有「百萬富翁蒙泰羅宮」之稱；設計則出自義大利建築師路易吉・馬尼尼（Luigi Manini）。</p><p>影片從樹林間的小塔樓與岩石拱門開始，接著穿過綠色水池的洞窟，最後空拍新曼努埃爾式（neo-Manueline）的宮殿，讓人看見石塔與尖頂如何鑲嵌在森林之間。最著名的是「啟蒙井」（Poço Iniciático），一座倒過來的「地下塔」，沿著螺旋階梯往下走約 27 公尺——傳說與共濟會、聖殿騎士的象徵有關，實際上是主人的浪漫想像。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>森林裡的石塔與拱門、洞窟綠色水池、宮殿與花園空拍。</div>
+        <div class="trivia"><b>冷知識：</b>莊園裡的隧道與洞窟彼此相通，走進去很容易迷失方向——這也是為什麼它常被形容為「一座可以走進去的藏寶圖」。</div>
+        <div class="transport">🚶 從辛特拉車站或舊城步行約 10–15 分鐘；入園後很多石階與暗道，建議留 2 小時。旺季可預先在網路購票。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=2750" target="_blank" rel="noopener">▶ 影片 45:50 這裡登場（約 2 分 04 秒）</a>
+          <button class="map-link" type="button" data-fly="regaleira">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-pena" data-region="coast">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/pena.jpg" alt="辛特拉山頂的佩納宮，黃色塔樓與紅色鐘塔" style="object-position:50% 50%">
+          <div class="rank-badge">20</div>
+          <span class="region-tag" style="background:#8e5ea2">里斯本海岸與辛特拉</span>
+        </div>
+        <button class="vframe" type="button" data-start="2874" data-end="3028" aria-label="就地播放「佩納宮」這一段影片">
+          <img loading="lazy" src="images/v/pena.jpg" alt="影片畫面：佩納宮">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 47:54–50:28　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 CEphoto, Uwe Aranas（CC BY-SA 3.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 辛特拉 · 聖佩德羅德佩納費林</div>
+        <h2>佩納宮 <span class="en-inline">Pena Palace</span></h2>
+        <div class="en-name">38°47′16″N 9°23′26″W</div>
+        <div class="facts"><span>🎨 黃紅彩色宮殿</span><span>🌟 葡萄牙七大奇蹟</span><span>🏛️ UNESCO 世界遺產</span></div>
+        <p>佩納宮位在辛特拉山頂，是十九世紀浪漫主義建築在世界上最鮮明的代表之一。宮殿在晴朗的日子裡，從里斯本與大部分都會區都看得見；現在它是國家紀念建築，也是聯合國世界遺產，並在票選中被列為「葡萄牙七大奇蹟」之一，同時還被總統與政府官員用於國家典禮場合。</p><p>宮殿以黃與紅兩種鮮豔顏色塗飾，混搭哥德、曼努埃爾、摩爾與文藝復興等各種風格；它是德國出身的斐迪南二世（Ferdinand II，瑪麗亞二世女王的夫婿）在中世紀修道院廢墟上主導興建的。影片以高空鏡頭、拉遠再拉近的環繞，展現這座宮殿如何「騎」在山頂的岩石與森林上，並在最後加入雲霧與長鏡頭，看起來像浮在雲層之上的童話城堡。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>彩色宮殿近景與空拍、山頂岩石與森林、雲霧中的長鏡頭。</div>
+        <div class="trivia"><b>冷知識：</b>佩納宮所在的山頭原本就是聖地：15 世紀末若昂二世夫婦朝聖來過，曼努埃爾一世下令在此蓋修道院並交給聖熱羅尼莫會；十九世紀斐迪南二世就是在這座修道院的基礎上，蓋出眼前這座彩色宮殿。</div>
+        <div class="transport">🚌 從辛特拉車站搭 434 號公車上山最省力（也可搭嘟嘟車或走約 30–40 分鐘的上坡路）；建議預訂門票、選一早的時段。山上常起霧，視野好不好要看天氣。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=2874" target="_blank" rel="noopener">▶ 影片 47:54 這裡登場（約 2 分 34 秒）</a>
+          <button class="map-link" type="button" data-fly="pena">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-moorish" data-region="coast">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/moorish.jpg" alt="辛特拉山脊上的摩爾人城堡城牆與塔樓" style="object-position:50% 50%">
+          <div class="rank-badge">21</div>
+          <span class="region-tag" style="background:#8e5ea2">里斯本海岸與辛特拉</span>
+        </div>
+        <button class="vframe" type="button" data-start="3028" data-end="3144" aria-label="就地播放「摩爾人城堡」這一段影片">
+          <img loading="lazy" src="images/v/moorish.jpg" alt="影片畫面：摩爾人城堡">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 50:28–52:24　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Jakub Hałun（CC BY 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 辛特拉 · 城堡山</div>
+        <h2>摩爾人城堡 <span class="en-inline">Castle of the Moors</span></h2>
+        <div class="en-name">38°47′33″N 9°23′22″W</div>
+        <div class="facts"><span>🏰 8–9 世紀建造</span><span>⚔️ 1147 年落入基督教軍隊</span><span>🏛️ UNESCO 辛特拉文化景觀</span></div>
+        <p>摩爾人城堡建在辛特拉山脊上，位在里斯本西北約 25 公里處，是 8、9 世紀由摩爾人興建的山頂城堡，在收復失地運動（Reconquista）中是重要的戰略據點，1147 年里斯本淪陷後，被基督教軍隊接手；現在是國家紀念建築，也是辛特拉世界遺產的一部分。</p><p>影片先以空拍讓城牆順著山脊像一條石頭蛇穿過樹林與大石之間，再切到塔樓頂端的旗幟與走道。城堡雖然已經殘破，但城牆與山勢結合得很好；十九世紀斐迪南二世也曾修整這裡，讓它成為浪漫主義園林的一部分。從城牆上往佩納宮與大西洋的方向看，是辛特拉最好看的角度之一。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>空拍山脊上蜿蜒的城牆、塔頂旗幟、城堡走道。</div>
+        <div class="trivia"><b>冷知識：</b>城牆走道有些路段沒有欄杆，強風或濕滑時要特別留意；但也正因為這樣，才有那種「走在山脊線上」的感覺。</div>
+        <div class="transport">🚌 同樣搭 434 號公車，從辛特拉車站到摩爾人城堡約 10 分鐘；與佩納宮相鄰，可以一起排在同一個半日行程裡（各自需要門票）。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3028" target="_blank" rel="noopener">▶ 影片 50:28 這裡登場（約 1 分 56 秒）</a>
+          <button class="map-link" type="button" data-fly="moorish">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-braga" data-region="north">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/braga.jpg" alt="布拉加雷奧宮華麗的洛可可立面與藍色瓷磚" style="object-position:50% 50%">
+          <div class="rank-badge">22</div>
+          <span class="region-tag" style="background:#1b6ca8">北部</span>
+        </div>
+        <button class="vframe" type="button" data-start="3144" data-end="3268" aria-label="就地播放「布拉加」這一段影片">
+          <img loading="lazy" src="images/v/braga.jpg" alt="影片畫面：布拉加">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 52:24–54:28　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Vitor Oliveira（CC BY-SA 2.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 北部 · 米尼奧 Minho</div>
+        <h2>布拉加 <span class="en-inline">Braga</span></h2>
+        <div class="en-name">41°33′04″N 8°25′42″W</div>
+        <div class="facts"><span>👥 轄區約 21.3 萬人（2025）</span><span>🏛️ 葡萄牙最古老的教區</span><span>🚶 葡萄牙朝聖之路必經</span></div>
+        <p>布拉加是葡萄牙西北部的米尼奧地區首府，轄區約 21.3 萬人，市區範圍延伸到卡瓦多河，是全國第三大都市區，僅次於里斯本與波爾圖。羅馬時代它叫「布拉卡拉奧古斯塔」（Bracara Augusta），是加拉埃契亞行省的首府；5 世紀更是蘇維匯王國的首都。它也擁有葡萄牙最古老的天主教總教區，並且是「葡萄牙朝聖之路」（Camino Português）上重要的一站。</p><p>影片在這裡先拍一座巴洛克教堂與廣場，再切到鋪著花崗岩的庭院與噴泉，接著是外牆貼滿藍白瓷磚、擁有華麗洛可可窗框的「雷奧宮」（Palácio do Raio）——一件把「瓷磚」推到建築藝術極致的作品。布拉加給人的第一印象是：古老、宗教氣息濃厚，卻又有年輕人在咖啡座聊天的日常感。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>巴洛克教堂與廣場、噴泉庭院、雷奧宮瓷磚立面。</div>
+        <div class="trivia"><b>冷知識：</b>布拉加在 2004 年歐洲盃足球賽中承辦了兩場比賽，2012 年還被選為歐洲青年之都——一座宗教古城同時也是活力十足的大學城。</div>
+        <div class="transport">🚆 波爾圖 Campanhã 或 São Bento 站搭火車約 1–1.3 小時；里斯本搭 Alfa Pendular 約 3.25–3.5 小時。市區步行即可走完大部分景點，前往山上朝聖所可搭公車。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3144" target="_blank" rel="noopener">▶ 影片 52:24 這裡登場（約 2 分 04 秒）</a>
+          <button class="map-link" type="button" data-fly="braga">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-bragase" data-region="north">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/bragase.jpg" alt="布拉加主教座堂正面的雙鐘塔與花崗岩立面" style="object-position:50% 22%">
+          <div class="rank-badge">23</div>
+          <span class="region-tag" style="background:#1b6ca8">北部</span>
+        </div>
+        <button class="vframe" type="button" data-start="3268" data-end="3356" aria-label="就地播放「布拉加主教座堂」這一段影片">
+          <img loading="lazy" src="images/v/bragase.jpg" alt="影片畫面：布拉加主教座堂">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 54:28–55:56　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Krzysztof Golik（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 布拉加 · 舊城</div>
+        <h2>布拉加主教座堂 <span class="en-inline">Braga Cathedral</span></h2>
+        <div class="en-name">41°33′00″N 8°25′39″W</div>
+        <div class="facts"><span>🏛️ 1910 年國家紀念建築</span><span>⛪ 葡萄牙與西班牙首席大主教座堂</span><span>🎹 金色巴洛克管風琴</span></div>
+        <p>布拉加主教座堂（Sé de Braga）是布拉加總教區與「葡萄牙與西班牙首席主教」的座堂，1910 年就已被列為國家紀念建築，也是葡萄牙歷史最悠久的教堂之一。建築從羅馬式、哥德式一路疊上巴洛克，走一趟就像看了一遍教堂建築史。</p><p>影片從主祭壇的金箔與繪畫拍起，接著轉到教堂內側的金色管風琴——它們被安排在中殿兩側的高處，雕飾滿佈金色天使與鍍金木雕，是布拉加最有名的畫面之一。除了教堂大殿，附近還有國王禮拜堂（Capela dos Reis）與各式各樣的石雕殘件，鏡頭在這裡花了大量時間慢慢帶過。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>主祭壇與內部裝飾、金色管風琴、中殿與側禮拜堂、石雕遺構。</div>
+        <div class="trivia"><b>冷知識：</b>據說葡萄牙開國君主阿方索・恩里克斯的父母（勃艮第的恩里克伯爵與泰蕾莎）就葬在主教座堂裡的國王禮拜堂——這座教堂因此與「葡萄牙王國的誕生」牽連在一起。</div>
+        <div class="transport">🚶 位在布拉加舊城中心，從火車站步行約 15 分鐘。教堂與周邊的小博物館建議合買套票，並留意彌撒時間，參觀動線會有所限制。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3268" target="_blank" rel="noopener">▶ 影片 54:28 這裡登場（約 1 分 28 秒）</a>
+          <button class="map-link" type="button" data-fly="bragase">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-bomjesus" data-region="north">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/bomjesus.jpg" alt="布拉加山上仁慈耶穌朝聖所的巴洛克之字形階梯" style="object-position:50% 32%">
+          <div class="rank-badge">24</div>
+          <span class="region-tag" style="background:#1b6ca8">北部</span>
+        </div>
+        <button class="vframe" type="button" data-start="3356" data-end="3472" aria-label="就地播放「山上仁慈耶穌朝聖所」這一段影片">
+          <img loading="lazy" src="images/v/bomjesus.jpg" alt="影片畫面：山上仁慈耶穌朝聖所">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 55:56–57:52　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Botafogo（公有領域）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 布拉加郊外 · 泰諾恩斯</div>
+        <h2>山上仁慈耶穌朝聖所 <span class="en-inline">Bom Jesus do Monte</span></h2>
+        <div class="en-name">41°33′18″N 8°22′37″W</div>
+        <div class="facts"><span>🪜 巴洛克階梯高 116 公尺</span><span>🏛️ UNESCO 世界遺產（2019）</span><span>🚠 水力纜車</span></div>
+        <p>山上仁慈耶穌朝聖所（Bom Jesus do Monte）位在布拉加郊外的泰諾恩斯（Tenões）山坡，是葡萄牙最著名的天主教朝聖地之一，2019 年 7 月 7 日被列入世界遺產。最著名的，是一段爬升 116 公尺的巴洛克階梯，一路以之字形（Z 字）的白色石階、噴泉與小禮拜堂串起，象徵朝聖者一步步向上的旅程。</p><p>影片先拍山頂教堂與花園、再一路往下看階梯、噴泉與雕像；階梯中段還有以「五感」為主題的噴泉。最讓人意外的是山腳的小纜車（Elevador do Bom Jesus）——它用水的重量與平衡原理往返，是世界上至今仍在營運的水力纜車之一，啟用於 1882 年。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>山頂教堂與花園、Z 字階梯與噴泉、雕像、從高處看的空拍。</div>
+        <div class="trivia"><b>冷知識：</b>傳統上有些朝聖者會一路祈禱、拾級而上，甚至跪著爬完階梯；即使不是信徒，走一遍也能感受到那種被設計出來的緩慢節奏。</div>
+        <div class="transport">🚌 布拉加市區搭公車（路線以現場公告為準）約 15–20 分鐘可到山腳；計程車也很方便。想省力可搭水力纜車上山、再走下坡欣賞階梯。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3356" target="_blank" rel="noopener">▶ 影片 55:56 這裡登場（約 1 分 56 秒）</a>
+          <button class="map-link" type="button" data-fly="bomjesus">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-sameiro" data-region="north">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/sameiro.jpg" alt="布拉加薩梅羅聖母朝聖所的白色圓頂大教堂" style="object-position:50% 30%">
+          <div class="rank-badge">25</div>
+          <span class="region-tag" style="background:#1b6ca8">北部</span>
+        </div>
+        <button class="vframe" type="button" data-start="3472" data-end="3568" aria-label="就地播放「薩梅羅聖母朝聖所」這一段影片">
+          <img loading="lazy" src="images/v/sameiro.jpg" alt="影片畫面：薩梅羅聖母朝聖所">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 57:52–59:28　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Otto Domes（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 布拉加郊外</div>
+        <h2>薩梅羅聖母朝聖所 <span class="en-inline">Sanctuary of Sameiro</span></h2>
+        <div class="en-name">41°32′30″N 8°22′11″W</div>
+        <div class="facts"><span>⛰️ 高出布拉加 350 公尺以上</span><span>📏 規模僅次於法蒂瑪</span><span>📅 6 月與 8 月朝聖</span></div>
+        <p>薩梅羅聖母朝聖所（Sanctuário do Sameiro）位在薩梅羅山頂，比布拉加市區高出 350 公尺以上，是葡萄牙最受朝聖者造訪的聖母朝聖所之一，整體規模僅次於法蒂瑪聖母朝聖所。距離布拉加市中心約 4 公里、距離山上仁慈耶穌朝聖所不到 2 公里，所以很多人會把兩個景點排在同一趟。</p><p>每年 6 月的第一個週日與 8 月的第三個週日，是朝聖高峰期，數以千計的信眾從各地湧來。影片用低角度與空拍展示這座白色圓頂教堂、兩側高聳的紀念柱與一整段階梯廣場；建築中軸線的視覺秩序，跟前一站彎曲的「之字形」階梯形成很有趣的對照。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>階梯廣場、白色圓頂教堂、紀念柱、從教堂前廣場拉遠的空拍。</div>
+        <div class="trivia"><b>冷知識：</b>登上聖殿圓頂可以眺望整個布拉加與米尼奧河谷——很多人說，這是看布拉加最好的位置，比在城裡任何一個觀景台都寬。</div>
+        <div class="transport">🚌 從布拉加搭公車或計程車約 15–20 分鐘；與山上仁慈耶穌朝聖所相隔不遠，體力好的人可沿路步行連接兩處（約 2 公里）。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3472" target="_blank" rel="noopener">▶ 影片 57:52 這裡登場（約 1 分 36 秒）</a>
+          <button class="map-link" type="button" data-fly="sameiro">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-portanova" data-region="north">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/portanova.jpg" alt="布拉加新門拱門與後方的舊城街道" style="object-position:50% 22%">
+          <div class="rank-badge">26</div>
+          <span class="region-tag" style="background:#1b6ca8">北部</span>
+        </div>
+        <button class="vframe" type="button" data-start="3568" data-end="3646" aria-label="就地播放「新門拱門」這一段影片">
+          <img loading="lazy" src="images/v/portanova.jpg" alt="影片畫面：新門拱門">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 59:28–60:46　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Wikimedia Commons 使用者（CC BY-SA 3.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 布拉加 · 舊城入口</div>
+        <h2>新門拱門 <span class="en-inline">Arco da Porta Nova</span></h2>
+        <div class="en-name">41°33′01″N 8°25′45″W</div>
+        <div class="facts"><span>🏛️ 巴洛克與新古典風格</span><span>✏️ 建築師安德烈・索阿雷斯</span><span>🛍️ 舊城購物街入口</span></div>
+        <p>新門拱門（Arco da Porta Nova）是一座巴洛克與新古典風格混合的拱門，由建築師安德烈・索阿雷斯（André Soares）在 18 世紀後期設計，位在布拉加舊城的「Sé」教區。它原本是舊城牆的入口，如今站在拱門下往裡看，是一條熱鬧的行人街，兩旁是店家與咖啡館。</p><p>影片在這一段用手持鏡頭慢慢走過街道，能看到街道上方掛著彩色的節慶裝飾，像是在慶典期間拍攝（這是我依畫面的推測）。從這裡進城，穿過拱門，就像一個小小的「儀式」，告訴你已經來到這座古城的中心。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>拱門與街道、手持鏡頭穿過人群、街上的彩色節慶裝飾。</div>
+        <div class="trivia"><b>冷知識：</b>布拉加的巴洛克建築有很多是出自安德烈・索阿雷斯之手——他被認為是 18 世紀布拉加最重要的建築師，雷奧宮也是他的作品風格之一。</div>
+        <div class="transport">🚶 位在舊城邊緣，從火車站沿 Avenida da Liberdade 走約 10–15 分鐘；穿過拱門就是行人購物街，適合吃點小點心、逛商店。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3568" target="_blank" rel="noopener">▶ 影片 59:28 這裡登場（約 1 分 18 秒）</a>
+          <button class="map-link" type="button" data-fly="portanova">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-obidos" data-region="central">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/obidos.jpg" alt="奧比多斯老城橘紅屋頂與遠方的中世紀城堡" style="object-position:50% 50%">
+          <div class="rank-badge">27</div>
+          <span class="region-tag" style="background:#b8892a">中部</span>
+        </div>
+        <button class="vframe" type="button" data-start="3646" data-end="3860" aria-label="就地播放「奧比多斯」這一段影片">
+          <img loading="lazy" src="images/v/obidos.jpg" alt="影片畫面：奧比多斯">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 60:46–64:20　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Lacobrigo（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 中部 · 歐斯特地區</div>
+        <h2>奧比多斯 <span class="en-inline">Óbidos</span></h2>
+        <div class="en-name">39°21′29″N 9°09′28″W</div>
+        <div class="facts"><span>👥 老城約 3,100 人</span><span>📐 轄區 141.55 平方公里</span><span>🏰 中世紀城牆小鎮</span></div>
+        <p>奧比多斯是葡萄牙中部歐斯特（Oeste）地區的城鎮，老城本身只有約 3,100 位居民，整個轄區 2011 年人口 11,772 人、面積 141.55 平方公里。這裡的歷史可以追溯到前羅馬時代，凱爾特語稱為 Eburobrittium。1282 年，國王迪尼什（Dinis）把這座城送給王后伊莎貝爾當結婚禮物，此後奧比多斯就有了「王后之城」的稱號，也被歷代王后當作陪嫁領地。</p><p>影片用了 3 分半來拍它：先是從空中看橘紅屋頂環繞著城堡與城牆，再切到白牆藍黃鑲邊的小巷與盛開的花。奧比多斯以「櫻桃酒」（Ginjinha de Óbidos，常用巧克力杯盛裝）與「書店小鎮」聞名，教堂也被改成書店，是許多旅人喜歡的慢遊地點。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>橘紅屋頂與城堡空拍、城牆、白牆藍黃鑲邊的小巷。</div>
+        <div class="trivia"><b>冷知識：</b>奧比多斯的房子外牆常以「藍色」或「黃色」的帶狀線條當裝飾——民間傳說藍色能驅趕蚊蠅、黃色帶來好運，是不是真的有效並無定論，但整個小鎮看起來因此特別有辨識度。</div>
+        <div class="transport">🚌 里斯本 Campo Grande 搭長途巴士約 1 小時；也可搭 Linha do Oeste 火車到 Óbidos 站（班次較少）。自駕約 1 小時，停車後步行進城。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3646" target="_blank" rel="noopener">▶ 影片 60:46 這裡登場（約 3 分 34 秒）</a>
+          <button class="map-link" type="button" data-fly="obidos">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-obidoswall" data-region="central">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/obidoswall.jpg" alt="奧比多斯的城堡塔樓與環城城牆" style="object-position:50% 50%">
+          <div class="rank-badge">28</div>
+          <span class="region-tag" style="background:#b8892a">中部</span>
+        </div>
+        <button class="vframe" type="button" data-start="3860" data-end="3934" aria-label="就地播放「奧比多斯環城城牆」這一段影片">
+          <img loading="lazy" src="images/v/obidoswall.jpg" alt="影片畫面：奧比多斯環城城牆">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 64:20–65:34　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Ana Rita Ferreira 80（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 奧比多斯 · 城堡與城牆</div>
+        <h2>奧比多斯環城城牆 <span class="en-inline">Town Wall Circuit</span></h2>
+        <div class="en-name">39°21′39″N 9°09′26″W</div>
+        <div class="facts"><span>🧱 約 1.5 公里環城</span><span>⚠️ 部分無欄杆</span><span>🏰 中世紀防禦</span></div>
+        <p>奧比多斯的環城城牆（Town Wall Circuit）是可以走上去的城牆，繞行老城一圈約 1.5 公里，從城牆上往下能看到白牆紅瓦的屋頂，往外則是大片田園、葡萄園與遠方的山。城牆與城堡的結構歷經多次修整，融合了摩爾時期與後來葡萄牙王國的防禦工程。</p><p>影片在這一段先拍城堡塔樓、再以貼近牆面的鏡頭穿過白牆小巷，最後回到轉角處藍色鑲邊的白色房屋。走在城牆上很有畫面，但務必小心：多數路段沒有欄杆，牆面也很窄，強風、下雨或帶小孩的時候要特別留意。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>城堡塔樓與城牆走道、白牆小巷與鑲邊、轉角房屋。</div>
+        <div class="trivia"><b>冷知識：</b>因為走城牆是要自己負責安全的活動，所以不少遊客選擇先在城內感受氣氛，再挑天氣好的時段登上城牆，看日落是很多人的首選。</div>
+        <div class="transport">🚶 抵達奧比多斯後，從主城門 Porta da Vila 附近的階梯即可登上城牆；建議穿防滑鞋，行程預留約 1 小時。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3860" target="_blank" rel="noopener">▶ 影片 64:20 這裡登場（約 1 分 14 秒）</a>
+          <button class="map-link" type="button" data-fly="obidoswall">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-alentejo" data-region="south">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/alentejo.jpg" alt="阿連特茹海岸的海邊堡壘與遠方的佩塞蓋魯島" style="object-position:50% 50%">
+          <div class="rank-badge">29</div>
+          <span class="region-tag" style="background:#12a4b5">南部</span>
+        </div>
+        <button class="vframe" type="button" data-start="3934" data-end="4074" aria-label="就地播放「阿連特茹海岸」這一段影片">
+          <img loading="lazy" src="images/v/alentejo.jpg" alt="影片畫面：阿連特茹海岸">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 65:34–67:54　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Vitor Oliveira（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 南部 · 阿連特茹海岸</div>
+        <h2>阿連特茹海岸 <span class="en-inline">Alentejo Coast</span></h2>
+        <div class="en-name">37°50′33″N 8°48′15″W</div>
+        <div class="facts"><span>📍 里斯本以南約 170 公里</span><span>🏰 海岸堡壘與佩塞蓋魯島</span><span>🚶 漁夫之路</span></div>
+        <p>阿連特茹（Alentejo）是葡萄牙面積最大的區域，涵蓋南部大片平原與西南海岸；影片標示只有「Alentejo」，依畫面我推測拍的是波爾圖科沃（Porto Covo）一帶海岸：這個位在錫尼什市（Sines）的教區位於里斯本以南約 170 公里，2011 年人口 1,038 人，以海灘與捕魚傳統聞名，地名據說來自捕捉龍蝦與螃蟹的漁網「covo」。</p><p>影片先拍一座白牆藍邊的村莊與教堂（我推測是波爾圖科沃或附近的小鎮），接著是山火冒出的煙、農田與整齊的白屋聚落；後半段則是海邊被海風打磨的堡壘——面對海灣的「佩塞蓋魯島」（Ilha do Pessegueiro）與岸上的 Nossa Senhora da Queimada 堡壘，是 16、17 世紀為了防範海盜而建的海防工程。從海灘往外看，小島像一片浮在海面上的綠色平台。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>白牆藍邊的村莊與教堂、田野與煙柱、佩塞蓋魯島與海邊堡壘、沙灘與礁岩海岸。</div>
+        <div class="trivia"><b>冷知識：</b>西南海岸有一條長距離健行路線「漁夫之路」（Trilho dos Pescadores），沿著懸崖與沙灘一路延伸，是葡萄牙最受歡迎的海岸徒步路線之一。</div>
+        <div class="transport">🚗 從里斯本自駕約 1.5–2 小時最方便；長途巴士可到錫尼什或波爾圖科沃（約 2.5 小時，班次較少）。沒有火車，租車才有辦法串起海灘與小村。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=3934" target="_blank" rel="noopener">▶ 影片 65:34 這裡登場（約 2 分 20 秒）</a>
+          <button class="map-link" type="button" data-fly="alentejo">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-guimaraes" data-region="north">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/guimaraes.jpg" alt="吉馬良斯城堡的石造塔樓與草坪" style="object-position:50% 50%">
+          <div class="rank-badge">30</div>
+          <span class="region-tag" style="background:#1b6ca8">北部</span>
+        </div>
+        <button class="vframe" type="button" data-start="4074" data-end="4290" aria-label="就地播放「吉馬良斯」這一段影片">
+          <img loading="lazy" src="images/v/guimaraes.jpg" alt="影片畫面：吉馬良斯">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 67:54–71:30　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 David Stanley（CC BY 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 北部 · 米尼奧</div>
+        <h2>吉馬良斯 <span class="en-inline">Guimarães</span></h2>
+        <div class="en-name">41°26′50″N 8°17′24″W</div>
+        <div class="facts"><span>🏛️ UNESCO 歷史中心（2001）</span><span>🎭 2012 歐洲文化之都</span><span>🌱 2026 歐洲綠色之都</span></div>
+        <p>吉馬良斯是葡萄牙北部的城市，歷史中心在 2001 年列為世界遺產，理由是它是「從中世紀聚落演化為現代城鎮」的少見完整範例。9 世紀時這裡叫 Vimaranes，可能來自勇士維馬拉・佩雷斯（Vímara Peres），他把這裡選為葡萄牙伯國的政府所在地；傳統上認為，未來的葡萄牙第一位國王阿方索・恩里克斯也誕生在此，因此街頭牆上寫著「Aqui nasceu Portugal」——這裡誕生了葡萄牙。</p><p>影片從奧利維拉廣場（Largo da Oliveira）的教堂鐘樓與露天座位拍起，再切到山丘上的吉馬良斯城堡（一般認為 10 世紀由穆馬多娜伯爵夫人興建）與旁邊的聖米格爾小教堂、布拉甘薩公爵府，最後是市區的街巷與紅瓦屋頂。約 70 分 10 秒開始的一段，出現一座海邊石橋旁的宮殿式建築，看起來像是卡斯凱什的「吉馬良斯伯爵宮」（Palácio dos Condes de Castro Guimarães）——姓氏剛好是 Guimarães，我猜是剪輯時被歸進同一個標籤。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>奧利維拉廣場與教堂鐘樓、吉馬良斯城堡與小教堂、公爵府與雕像、市區街巷；70 分 10 秒起的海邊宮殿（疑為卡斯凱什）。</div>
+        <div class="trivia"><b>冷知識：</b>吉馬良斯與斯洛維尼亞的馬里博爾在 2012 年一起擔任歐洲文化之都；2026 年又獲頒歐洲綠色之都，一座「國家出生地」的小城，一直在為自己創造新的身份。</div>
+        <div class="transport">🚌 波爾圖搭巴士或火車約 1–1.3 小時；布拉加搭巴士約 40 分鐘。老城區步行就能走完，前往城堡需要走一段上坡。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=4074" target="_blank" rel="noopener">▶ 影片 67:54 這裡登場（約 3 分 36 秒）</a>
+          <button class="map-link" type="button" data-fly="guimaraes">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node " id="n-batalha" data-region="central">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/batalha.jpg" alt="巴塔利亞修道院的火焰式哥德立面與尖塔" style="object-position:50% 50%">
+          <div class="rank-badge">31</div>
+          <span class="region-tag" style="background:#b8892a">中部</span>
+        </div>
+        <button class="vframe" type="button" data-start="4290" data-end="4424" aria-label="就地播放「巴塔利亞修道院」這一段影片">
+          <img loading="lazy" src="images/v/batalha.jpg" alt="影片畫面：巴塔利亞修道院">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 71:30–73:44　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Alvesgaspar（CC BY-SA 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 中部 · 巴塔利亞</div>
+        <h2>巴塔利亞修道院 <span class="en-inline">Batalha Monastery</span></h2>
+        <div class="en-name">39°39′33″N 8°49′35″W</div>
+        <div class="facts"><span>🏛️ UNESCO 世界遺產（1983）</span><span>⚔️ 1385 年阿茹巴羅塔戰役</span><span>🎨 火焰式哥德式</span></div>
+        <p>巴塔利亞修道院正式名稱是「勝利聖母修道院」（Mosteiro de Santa Maria da Vitória），是為了紀念 1385 年阿茹巴羅塔戰役（Battle of Aljubarrota）——葡萄牙擊敗卡斯提亞、確保獨立——所興建的多明我會修道院，同時也是十五世紀阿維斯王朝的王室陵寢。它是葡萄牙晚期「火焰式哥德」建築最重要、最有原創性的代表之一，並融入了曼努埃爾風格。</p><p>影片以大範圍的空拍展示這座修道院的規模：尖塔、迴廊、方形的庭院，以及遠處的小鎮街廓。修道院最著名的是後方那座沒有屋頂的「未完成禮拜堂」（Capelas Imperfeitas）：它原本要成為國王杜阿爾特的陵寢，卻因為工程停頓而始終沒有蓋好，反而成了最具詩意的遺跡。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>修道院整體空拍、方形迴廊庭院、尖塔與扶壁、小鎮廣場。</div>
+        <div class="trivia"><b>冷知識：</b>修道院工程歷經一百多年、換過好幾位建築師，也因此同一座建築裡看得到不同時期的風格如何一層層疊上去。</div>
+        <div class="transport">🚌 里斯本 Sete Rios 搭長途巴士約 1.5 小時；自駕約 1.25 小時。常與法蒂瑪、納札雷、奧比多斯排成一日或兩日的中部行程。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=4290" target="_blank" rel="noopener">▶ 影片 71:30 這裡登場（約 2 分 14 秒）</a>
+          <button class="map-link" type="button" data-fly="batalha">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    <article class="node alt" id="n-caboroca" data-region="coast">
+      <div class="node-media">
+        <div class="photo">
+          <img loading="lazy" src="images/caboroca.jpg" alt="羅卡角的懸崖、燈塔與夕陽下的大西洋" style="object-position:50% 50%">
+          <div class="rank-badge">32</div>
+          <span class="region-tag" style="background:#8e5ea2">里斯本海岸與辛特拉</span>
+        </div>
+        <button class="vframe" type="button" data-start="4424" data-end="4586" aria-label="就地播放「羅卡角與熊灘」這一段影片">
+          <img loading="lazy" src="images/v/caboroca.jpg" alt="影片畫面：羅卡角與熊灘">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 73:44–76:26　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">📷 Olga1969（CC BY 4.0）· 影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">🇵🇹 辛特拉山最西端</div>
+        <h2>羅卡角與熊灘 <span class="en-inline">Cabo da Roca &amp; Praia da Ursa</span></h2>
+        <div class="en-name">38°46′51″N 9°30′02″W</div>
+        <div class="facts"><span>🧭 歐洲大陸最西點</span><span>💡 燈塔 1772 年啟用</span><span>🏖️ 熊灘 Praia da Ursa</span></div>
+        <p>羅卡角（Cabo da Roca）是辛特拉山脈的最西端，也是葡萄牙本土、歐洲大陸、甚至整個歐亞大陸的最西點，位在辛特拉市阿佐亞（Azóia）附近、里斯本正西方；岬角上的燈塔從 1772 年開始運作。詩人卡蒙斯有一句被刻在紀念碑上的名句，大意是「陸地在此結束，海洋由此開始」——這也是本頁標題的靈感。</p><p>影片先用長鏡頭拍下金黃色懸崖與海面上的夕照，再環繞紅白色的燈塔，最後拉遠展示海岸線與遠方浪花。標題裡的「熊灘」（Praia da Ursa）是附近一片隱藏在峭壁之下的海灘，因為一塊岩石的形狀像熊而得名（據說如此）；通往海灘的小徑陡峭而且危險，並不是每個旅人都適合下去。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>金色懸崖與夕陽、紅白燈塔近景與空拍、海岸線、熊灘的海蝕岩地形。</div>
+        <div class="trivia"><b>冷知識：</b>遊客中心可以買一張「到過歐洲最西端」的證書，上面有你的名字與日期——一張小小的紀念品，剛好呼應這一整部片的主題：走到歐洲的盡頭。</div>
+        <div class="transport">🚌 從卡斯凱什或辛特拉搭 403 號公車約 40 分鐘可到；自駕約 30 分鐘。沒有火車直達；岬角風大，記得帶外套。</div>
+        <div class="actions">
+          <a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=4424" target="_blank" rel="noopener">▶ 影片 73:44 這裡登場（約 2 分 42 秒）</a>
+          <button class="map-link" type="button" data-fly="caboroca">📍 在地圖上看</button>
+        </div>
+      </div>
+    </article>
+    
+    <article class="node special" id="n-outro">
+      <div class="node-media">
+        <button class="vframe" type="button" data-start="4586" data-end="4856" aria-label="就地播放「不再標註地點的尾聲」這一段影片">
+          <img loading="lazy" src="images/v/outro.jpg" alt="影片畫面：不再標註地點的尾聲">
+          <span class="play">▶</span>
+          <span class="vlabel">影片 76:26–80:56　點一下就地播放</span>
+        </button>
+        <div class="photo-credit">影片畫面 © Unreal Atlas 異境</div>
+      </div>
+      <div class="node-text">
+        <div class="country">尾聲 · 回顧蒙太奇</div>
+        <h2>不再標註地點的尾聲 <span class="en-inline">Epilogue</span></h2>
+        <p>從 76 分 26 秒起，左下角的地點標籤全部消失，影片改用快切把前面看過的地方重新剪成一段回顧：七城湖的火山口、亞速爾山坡上的白色小教堂與階梯花園（我推測是聖米格爾島的和平聖母小堂）、阿爾馬達的基督像與里斯本的商業廣場延時攝影、羅西歐廣場、卡斯凱什的碼頭與海岸旅館，之後是馬德拉山谷裡的小鎮、阿爾加維的海蝕洞、佩納宮與奧比多斯，最後以阿連特茹海邊的堡壘作結。</p><p>這一段最適合當成「複習」：看過前面 32 個節點之後，再看一次，會發現很多畫面已經認得出來。影片總長 81 分鐘，最後停在 80 分 56 秒。</p>
+        <div class="seen"><b>📽️ 影片裡：</b>七城湖、亞速爾白色小教堂、基督像、商業廣場、羅西歐、卡斯凱什、馬德拉山谷小鎮、阿爾加維海蝕洞、佩納宮、奧比多斯、阿連特茹堡壘。</div>
+        
+        <div class="actions"><a class="watch-link" href="https://youtu.be/hb2RsQ2j0YQ?t=4586" target="_blank" rel="noopener">▶ 影片 76:26 這裡開始（約 4 分 30 秒）</a></div>
+      </div>
+    </article>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div style="font-size:15px;color:#fff;font-weight:700;margin-bottom:6px;">葡萄牙的奇觀｜陸止於此，海始於斯</div>
+    <p style="opacity:.85;max-width:720px;">內容整理自 YouTube 頻道《Unreal Atlas 異境》影片〈<a href="https://youtu.be/hb2RsQ2j0YQ" target="_blank" rel="noopener">葡萄牙的奇觀｜歐洲的盡頭｜葡萄牙最令人驚嘆的地方｜4K旅行紀錄片</a>〉。節點劃分依據影片左下角的地點標籤；地理、歷史、人口等資料另行參考 Wikipedia 等公開資料後改寫；標註「推測」之處為依畫面比對所得。</p>
+
+    <div style="margin-top:24px;font-weight:600;color:#fff;font-size:13px;">相片來源與授權（Wikimedia Commons）</div>
+    <div class="credits-grid"><div>七城湖 — Lacobrigo（CC BY-SA 4.0）</div><div>莫尼斯港 — Bjørn Christian Tørrissen（CC BY-SA 3.0）</div><div>亞速爾群島（多島合集） — Jules Verne Times Two（CC BY-SA 4.0）</div><div>里斯本 — Vitor Oliveira（CC BY-SA 2.0）</div><div>熱羅尼莫斯修道院 — Ingo Mehling（CC BY-SA 4.0）</div><div>貝倫塔 — Alvesgaspar（CC BY-SA 3.0）</div><div>商業廣場 — Bernard Gagnon（CC BY 4.0）</div><div>阿爾法瑪 — Dale Cruse（CC BY 4.0）</div><div>聖若熱城堡 — fulviusbsas（CC BY-SA 3.0）</div><div>羅西歐廣場 — Thomas from Vienna（CC BY 2.0）</div><div>卡斯凱什 — Jorge Franganillo（CC BY 2.0）</div><div>馬德拉（島嶼風光） — Diego Delso（CC BY-SA 4.0）</div><div>納札雷 — Luis Ascenso（CC BY 2.0）</div><div>海上磨坊村 — Husond（CC BY-SA 3.0）</div><div>阿爾加維海岸 — Marty B（CC BY-SA 2.0）</div><div>蒙桑圖 — Bosc d&#x27;Anjou（CC BY 2.0）</div><div>辛特拉 — Berthold Werner（CC BY-SA 4.0）</div><div>蒙塞拉特宮 — Jorge Lobo（CC BY-SA 4.0）</div><div>雷加萊拉莊園 — Diego Delso（CC BY-SA 4.0）</div><div>佩納宮 — CEphoto, Uwe Aranas（CC BY-SA 3.0）</div><div>摩爾人城堡 — Jakub Hałun（CC BY 4.0）</div><div>布拉加 — Vitor Oliveira（CC BY-SA 2.0）</div><div>布拉加主教座堂 — Krzysztof Golik（CC BY-SA 4.0）</div><div>山上仁慈耶穌朝聖所 — Botafogo（公有領域）</div><div>薩梅羅聖母朝聖所 — Otto Domes（CC BY-SA 4.0）</div><div>新門拱門 — Wikimedia Commons 使用者（CC BY-SA 3.0）</div><div>奧比多斯 — Lacobrigo（CC BY-SA 4.0）</div><div>奧比多斯環城城牆 — Ana Rita Ferreira 80（CC BY-SA 4.0）</div><div>阿連特茹海岸 — Vitor Oliveira（CC BY-SA 4.0）</div><div>吉馬良斯 — David Stanley（CC BY 4.0）</div><div>巴塔利亞修道院 — Alvesgaspar（CC BY-SA 4.0）</div><div>羅卡角與熊灘 — Olga1969（CC BY 4.0）</div><div>序章・波爾圖 — Deensel（CC BY 2.0）</div></div>
+
+    <div class="footer-note">各節點下方的影片縮圖截自原始影片，版權屬 Unreal Atlas 異境，僅作為導覽用的小圖，並附有時間點連結與就地播放；如頻道方有任何疑慮，請告知後即刻調整。地圖圖資 © OpenStreetMap contributors，透過 Leaflet.js 繪製。本頁為非官方整理專案，與原影片頻道無合作關係，純粹為個人旅遊資料整理與延伸閱讀之用。</div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const VID = 'hb2RsQ2j0YQ';
+  const nodes = [{"n": 1, "k": "sete", "name": "七城湖", "en": "Sete Cidades", "region": "azores", "col": "#1f8a70", "lat": 37.855, "lng": -25.7864, "t": 110, "tt": "01:50"}, {"n": 2, "k": "portomoniz", "name": "莫尼斯港", "en": "Porto Moniz", "region": "madeira", "col": "#d9822b", "lat": 32.8676, "lng": -17.1697, "t": 254, "tt": "04:14"}, {"n": 3, "k": "azores", "name": "亞速爾群島（多島合集）", "en": "Azores", "region": "azores", "col": "#1f8a70", "lat": 39.56, "lng": -31.12, "t": 418, "tt": "06:58"}, {"n": 4, "k": "lisbon", "name": "里斯本", "en": "Lisbon", "region": "lisbon", "col": "#c1502e", "lat": 38.7253, "lng": -9.15, "t": 618, "tt": "10:18"}, {"n": 5, "k": "jeronimos", "name": "熱羅尼莫斯修道院", "en": "Jerónimos Monastery", "region": "lisbon", "col": "#c1502e", "lat": 38.6978, "lng": -9.2061, "t": 796, "tt": "13:16"}, {"n": 6, "k": "belem", "name": "貝倫塔", "en": "Belém Tower", "region": "lisbon", "col": "#c1502e", "lat": 38.6917, "lng": -9.216, "t": 894, "tt": "14:54"}, {"n": 7, "k": "comercio", "name": "商業廣場", "en": "Praça do Comércio", "region": "lisbon", "col": "#c1502e", "lat": 38.7075, "lng": -9.1364, "t": 1044, "tt": "17:24"}, {"n": 8, "k": "alfama", "name": "阿爾法瑪", "en": "Alfama District", "region": "lisbon", "col": "#c1502e", "lat": 38.7122, "lng": -9.13, "t": 1154, "tt": "19:14"}, {"n": 9, "k": "saojorge", "name": "聖若熱城堡", "en": "São Jorge Castle", "region": "lisbon", "col": "#c1502e", "lat": 38.7139, "lng": -9.1336, "t": 1256, "tt": "20:56"}, {"n": 10, "k": "rossio", "name": "羅西歐廣場", "en": "Rossio Square", "region": "lisbon", "col": "#c1502e", "lat": 38.7139, "lng": -9.1394, "t": 1352, "tt": "22:32"}, {"n": 11, "k": "cascais", "name": "卡斯凱什", "en": "Cascais", "region": "coast", "col": "#8e5ea2", "lat": 38.6979, "lng": -9.4215, "t": 1446, "tt": "24:06"}, {"n": 12, "k": "madeira", "name": "馬德拉（島嶼風光）", "en": "Madeira", "region": "madeira", "col": "#d9822b", "lat": 32.745, "lng": -16.7, "t": 1652, "tt": "27:32"}, {"n": 13, "k": "nazare", "name": "納札雷", "en": "Nazaré", "region": "central", "col": "#b8892a", "lat": 39.6011, "lng": -9.0706, "t": 1852, "tt": "30:52"}, {"n": 14, "k": "azenhas", "name": "海上磨坊村", "en": "Azenhas do Mar", "region": "coast", "col": "#8e5ea2", "lat": 38.8406, "lng": -9.46, "t": 2042, "tt": "34:02"}, {"n": 15, "k": "algarve", "name": "阿爾加維海岸", "en": "Algarve", "region": "south", "col": "#12a4b5", "lat": 37.0797, "lng": -8.6661, "t": 2174, "tt": "36:14"}, {"n": 16, "k": "monsanto", "name": "蒙桑圖", "en": "Monsanto", "region": "central", "col": "#b8892a", "lat": 40.0378, "lng": -7.1147, "t": 2342, "tt": "39:02"}, {"n": 17, "k": "sintra", "name": "辛特拉", "en": "Sintra", "region": "coast", "col": "#8e5ea2", "lat": 38.7992, "lng": -9.3883, "t": 2554, "tt": "42:34"}, {"n": 18, "k": "monserrate", "name": "蒙塞拉特宮", "en": "Monserrate Palace", "region": "coast", "col": "#8e5ea2", "lat": 38.7942, "lng": -9.4206, "t": 2666, "tt": "44:26"}, {"n": 19, "k": "regaleira", "name": "雷加萊拉莊園", "en": "Quinta da Regaleira", "region": "coast", "col": "#8e5ea2", "lat": 38.7965, "lng": -9.3958, "t": 2750, "tt": "45:50"}, {"n": 20, "k": "pena", "name": "佩納宮", "en": "Pena Palace", "region": "coast", "col": "#8e5ea2", "lat": 38.7878, "lng": -9.3906, "t": 2874, "tt": "47:54"}, {"n": 21, "k": "moorish", "name": "摩爾人城堡", "en": "Castle of the Moors", "region": "coast", "col": "#8e5ea2", "lat": 38.7925, "lng": -9.3894, "t": 3028, "tt": "50:28"}, {"n": 22, "k": "braga", "name": "布拉加", "en": "Braga", "region": "north", "col": "#1b6ca8", "lat": 41.5511, "lng": -8.4283, "t": 3144, "tt": "52:24"}, {"n": 23, "k": "bragase", "name": "布拉加主教座堂", "en": "Braga Cathedral", "region": "north", "col": "#1b6ca8", "lat": 41.5499, "lng": -8.4274, "t": 3268, "tt": "54:28"}, {"n": 24, "k": "bomjesus", "name": "山上仁慈耶穌朝聖所", "en": "Bom Jesus do Monte", "region": "north", "col": "#1b6ca8", "lat": 41.5549, "lng": -8.377, "t": 3356, "tt": "55:56"}, {"n": 25, "k": "sameiro", "name": "薩梅羅聖母朝聖所", "en": "Sanctuary of Sameiro", "region": "north", "col": "#1b6ca8", "lat": 41.5418, "lng": -8.3698, "t": 3472, "tt": "57:52"}, {"n": 26, "k": "portanova", "name": "新門拱門", "en": "Arco da Porta Nova", "region": "north", "col": "#1b6ca8", "lat": 41.5503, "lng": -8.4293, "t": 3568, "tt": "59:28"}, {"n": 27, "k": "obidos", "name": "奧比多斯", "en": "Óbidos", "region": "central", "col": "#b8892a", "lat": 39.3581, "lng": -9.1578, "t": 3646, "tt": "60:46"}, {"n": 28, "k": "obidoswall", "name": "奧比多斯環城城牆", "en": "Town Wall Circuit", "region": "central", "col": "#b8892a", "lat": 39.3609, "lng": -9.1571, "t": 3860, "tt": "64:20"}, {"n": 29, "k": "alentejo", "name": "阿連特茹海岸", "en": "Alentejo Coast", "region": "south", "col": "#12a4b5", "lat": 37.8425, "lng": -8.8041, "t": 3934, "tt": "65:34"}, {"n": 30, "k": "guimaraes", "name": "吉馬良斯", "en": "Guimarães", "region": "north", "col": "#1b6ca8", "lat": 41.4472, "lng": -8.29, "t": 4074, "tt": "67:54"}, {"n": 31, "k": "batalha", "name": "巴塔利亞修道院", "en": "Batalha Monastery", "region": "central", "col": "#b8892a", "lat": 39.6592, "lng": -8.8263, "t": 4290, "tt": "71:30"}, {"n": 32, "k": "caboroca", "name": "羅卡角與熊灘", "en": "Cabo da Roca & Praia da Ursa", "region": "coast", "col": "#8e5ea2", "lat": 38.7808, "lng": -9.5006, "t": 4424, "tt": "73:44"}];
+
+  /* ---- 地圖 ---- */
+  const map = L.map('map', {scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom:18
+  }).addTo(map);
+  const markers = {};
+  nodes.forEach(t=>{
+    const icon = L.divIcon({className:'leaflet-div-icon pin', html:'<span>'+t.n+'</span>', iconSize:[30,30], iconAnchor:[15,30]});
+    icon.options.className = 'leaflet-div-icon pin';
+    const m = L.marker([t.lat,t.lng], {icon}).addTo(map);
+    m.getElement && setTimeout(()=>{ const el=m.getElement(); if(el){ el.style.background=t.col; } },0);
+    m.bindPopup('<b>'+t.n+'. '+t.name+'</b><br>'+t.en+'<br>影片 '+t.tt+' 登場<br>'+
+      '<a class="pop-btn" href="#n-'+t.k+'">看介紹</a>'+
+      '<a class="pop-btn alt" target="_blank" rel="noopener" href="https://youtu.be/'+VID+'?t='+t.t+'">▶ 看影片</a>');
+    markers[t.k] = m;
+  });
+  function fit(filter){
+    let pts = nodes.filter(t=>{
+      if(filter==='all') return true;
+      if(filter==='mainland') return t.region!=='azores' && t.region!=='madeira';
+      return t.region===filter;
+    }).map(t=>[t.lat,t.lng]);
+    if(!pts.length) return;
+    if(pts.length===1){ map.setView(pts[0], 9); }
+    else map.fitBounds(pts, {padding:[40,40], maxZoom: filter==='all'?6:10});
+  }
+  fit('mainland');
+  document.getElementById('mapTools').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#mapTools button').forEach(x=>x.classList.toggle('on', x===b));
+    fit(b.dataset.f);
+  });
+  // 「在地圖上看」
+  document.addEventListener('click', e=>{
+    const b = e.target.closest('[data-fly]'); if(!b) return;
+    const k = b.dataset.fly, m = markers[k]; if(!m) return;
+    document.getElementById('map-section').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>{ map.setView(m.getLatLng(), 11); m.openPopup(); }, 450);
+  });
+
+  /* ---- 就地播放此段影片 ---- */
+  document.addEventListener('click', e=>{
+    const b = e.target.closest('.vframe'); if(!b) return;
+    const s = b.dataset.start, en = b.dataset.end;
+    const box = document.createElement('div');
+    box.className = 'vplayer';
+    box.innerHTML = '<iframe src="https://www.youtube.com/embed/'+VID+'?start='+s+'&end='+en+'&autoplay=1&rel=0&modestbranding=1&playsinline=1" '+
+      'title="影片片段" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    b.replaceWith(box);
+  });
+</script>
+
+</body>
+</html>
